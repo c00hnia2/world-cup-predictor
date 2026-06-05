@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { requireAdminAccess } from "@/lib/require-admin";
 import { calculatePoints } from "@/lib/scoring";
 import { createClient } from "@/utils/supabase/server";
 
@@ -28,6 +29,11 @@ export async function resolveMatch(
   realScoreA: number,
   realScoreB: number,
 ): Promise<ResolveMatchResult> {
+  const adminCheck = await requireAdminAccess();
+  if (!adminCheck.authorized) {
+    return { success: false, message: adminCheck.message };
+  }
+
   if (!matchId) {
     return { success: false, message: "Brak identyfikatora meczu." };
   }
