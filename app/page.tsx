@@ -1,3 +1,4 @@
+import { HomeAuthNav } from "@/components/HomeAuthNav";
 import { MatchDaySection } from "@/components/MatchDaySection";
 import { groupMatchesByDay } from "@/lib/group-matches-by-day";
 import { normalizeMatch } from "@/lib/normalize-match";
@@ -34,7 +35,10 @@ export default async function Home() {
 
   return (
     <div className="min-h-full bg-zinc-50 dark:bg-zinc-950">
-      <main className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-6xl px-4 pt-6 sm:px-6 lg:px-8">
+        <HomeAuthNav />
+      </div>
+      <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
         <header className="mb-10 text-center sm:text-left">
           <p className="text-sm font-medium uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
             Mistrzostwa Świata 2026
