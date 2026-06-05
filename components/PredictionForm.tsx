@@ -52,7 +52,7 @@ function SubmitButton() {
           <span>Zapisywanie…</span>
         </>
       ) : (
-        <span>Typuj</span>
+        <span>Potwierdź</span>
       )}
     </button>
   );
