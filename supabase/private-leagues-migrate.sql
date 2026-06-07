@@ -1,2 +1,0 @@
--- Ten plik został scalony z private-leagues.sql.
--- Uruchom zamiast niego: supabase/private-leagues.sql
