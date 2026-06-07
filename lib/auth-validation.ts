@@ -29,13 +29,30 @@ export function validateUsername(username: string): string | null {
   return null;
 }
 
+// Walidacja przy logowaniu — tylko obecność (siłę sprawdzamy przy rejestracji,
+// żeby nie zablokować istniejących kont z krótszym hasłem).
 export function validatePassword(password: string): string | null {
   if (!password) {
     return "Hasło jest wymagane.";
   }
 
-  if (password.length < 6) {
-    return "Hasło musi mieć co najmniej 6 znaków.";
+  return null;
+}
+
+// Walidacja przy rejestracji/zmianie hasła — polityka siły hasła.
+const MIN_PASSWORD_LENGTH = 8;
+
+export function validateNewPassword(password: string): string | null {
+  if (!password) {
+    return "Hasło jest wymagane.";
+  }
+
+  if (password.length < MIN_PASSWORD_LENGTH) {
+    return `Hasło musi mieć co najmniej ${MIN_PASSWORD_LENGTH} znaków.`;
+  }
+
+  if (!/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) {
+    return "Hasło musi zawierać co najmniej jedną literę i jedną cyfrę.";
   }
 
   return null;

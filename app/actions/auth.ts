@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { translateAuthError } from "@/lib/auth-errors";
 import {
   validateEmail,
+  validateNewPassword,
   validatePassword,
   validateUsername,
 } from "@/lib/auth-validation";
@@ -21,7 +22,7 @@ export async function register(
 
   const emailError = validateEmail(email);
   const usernameError = validateUsername(username);
-  const passwordError = validatePassword(password);
+  const passwordError = validateNewPassword(password);
 
   if (emailError || usernameError || passwordError) {
     return {
