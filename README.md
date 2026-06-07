@@ -4,6 +4,8 @@ A full-stack prediction game for the 2026 World Cup, built with Next.js (App Rou
 React Server Components and Supabase. Users predict match scores, climb the global
 leaderboard and compete with friends in private leagues.
 
+**🌐 Live demo:** [wcp-app.vercel.app](https://wcp-app.vercel.app/)
+
 ## 📝 Scoring
 
 | Result | Points |
