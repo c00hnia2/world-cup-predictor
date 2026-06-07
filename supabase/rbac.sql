@@ -64,6 +64,36 @@ create policy "Users can update own profile"
   using (auth.uid() = id)
   with check (auth.uid() = id);
 
+-- Użytkownik nie może sam nadać sobie roli admin (trigger poniżej)
+create or replace function public.enforce_user_profile_update_rules()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if auth.uid() = old.id and new.role is distinct from old.role then
+    if not exists (
+      select 1
+      from public.users
+      where id = auth.uid()
+        and role = 'admin'
+    ) then
+      raise exception 'Nie możesz zmienić własnej roli.';
+    end if;
+  end if;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists enforce_user_profile_update_rules on public.users;
+
+create trigger enforce_user_profile_update_rules
+  before update on public.users
+  for each row
+  execute function public.enforce_user_profile_update_rules();
+
 -- Admin może aktualizować profile (np. naliczanie total_points po meczu)
 drop policy if exists "Admins can update all profiles" on public.users;
 create policy "Admins can update all profiles"
