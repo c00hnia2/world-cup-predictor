@@ -3,7 +3,14 @@
 import { useFormStatus } from "react-dom";
 import { logout } from "@/app/actions/auth";
 
-function LogoutSubmitButton() {
+const defaultButtonClass =
+  "inline-flex h-10 w-full items-center justify-center rounded-xl border border-white/10 bg-white/5 px-3 text-sm font-medium text-zinc-200 transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-70";
+
+interface LogoutButtonProps {
+  className?: string;
+}
+
+function LogoutSubmitButton({ className = defaultButtonClass }: LogoutButtonProps) {
   const { pending } = useFormStatus();
 
   return (
@@ -11,17 +18,17 @@ function LogoutSubmitButton() {
       type="submit"
       disabled={pending}
       aria-busy={pending}
-      className="inline-flex h-9 items-center rounded-xl border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 hover:text-zinc-900 disabled:cursor-not-allowed disabled:opacity-70 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-50"
+      className={className}
     >
       {pending ? "Wylogowywanie…" : "Wyloguj"}
     </button>
   );
 }
 
-export function LogoutButton() {
+export function LogoutButton({ className }: LogoutButtonProps) {
   return (
-    <form action={logout}>
-      <LogoutSubmitButton />
+    <form action={logout} className="w-full">
+      <LogoutSubmitButton className={className} />
     </form>
   );
 }
