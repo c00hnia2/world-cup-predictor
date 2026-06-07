@@ -8,16 +8,19 @@ import {
 } from "@/lib/prediction-lock";
 import type { PredictionFormState } from "@/types/prediction";
 
+// Mapuje surowe błędy bazy na bezpieczne komunikaty dla użytkownika.
+// Pełny komunikat trafia wyłącznie do logów serwera.
 function mapPredictionError(message: string): string {
-  if (message.includes("row-level security")) {
-    return "Brak uprawnień do zapisu typu. Uruchom w Supabase plik supabase/predictions-rls.sql.";
-  }
-
   if (message.includes("invalid input syntax for type uuid")) {
     return "Sesja wygasła. Zaloguj się ponownie.";
   }
 
-  return `Nie udało się zapisać typu: ${message}`;
+  // Blokada typowania egzekwowana triggerem w bazie (hardening-rls.sql).
+  if (message.includes("Typowanie jest zamknięte")) {
+    return "Typowanie jest zamknięte dla tego meczu.";
+  }
+
+  return "Nie udało się zapisać typu. Spróbuj ponownie.";
 }
 
 export async function submitPrediction(

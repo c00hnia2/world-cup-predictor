@@ -1,4 +1,4 @@
-import type { Match, Team } from "@/types/match";
+import type { Match } from "@/types/match";
 
 export interface PredictionFormState {
   status: "idle" | "success" | "error";

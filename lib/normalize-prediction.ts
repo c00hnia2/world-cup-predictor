@@ -1,8 +1,5 @@
 import type { PredictionMatch, UserPredictionEntry } from "@/types/prediction";
-import type { Team } from "@/types/match";
 import { normalizeMatch, type MatchRow } from "@/lib/normalize-match";
-
-type TeamRelation = Team | Team[] | null;
 
 type MatchRelation = (MatchRow & {
   score_a: number | null;
