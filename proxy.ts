@@ -4,7 +4,7 @@ import {
   updateSession,
 } from "@/utils/supabase/middleware";
 
-const PROTECTED_PREFIXES = ["/admin", "/dashboard"] as const;
+const PROTECTED_PREFIXES = ["/admin", "/dashboard", "/leagues"] as const;
 const AUTH_ROUTE_PREFIXES = ["/login", "/register"] as const;
 
 function matchesRoutePrefix(
@@ -36,7 +36,7 @@ function createRedirectWithSessionCookies(
   return copySupabaseCookies(supabaseResponse, redirectResponse);
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const { supabaseResponse, user } = await updateSession(request);
 
