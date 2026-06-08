@@ -12,14 +12,11 @@ export interface LeagueSummary {
   created_at: string;
 }
 
+import type { PublicProfile } from "@/types/user";
+
 export interface LeagueMemberWithProfile {
   joined_at: string;
-  user: {
-    id: string;
-    username: string | null;
-    email: string | null;
-    total_points: number | null;
-  } | null;
+  user: PublicProfile | null;
 }
 
 export interface LeagueRankEntry {

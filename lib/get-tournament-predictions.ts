@@ -1,3 +1,4 @@
+import { fetchPublicProfilesByIds } from "@/lib/fetch-public-profiles";
 import { normalizeTournamentPrediction } from "@/lib/normalize-tournament-prediction";
 import { getUserDisplayName } from "@/types/user";
 import { createClient } from "@/utils/supabase/server";
@@ -21,7 +22,6 @@ type TournamentPredictionRow = {
   points_earned: number | null;
   predicted_winner: { id: string; name: string } | { id: string; name: string }[] | null;
   predicted_top_scorer: { id: string; name: string } | { id: string; name: string }[] | null;
-  user: { username: string | null; email: string | null } | null;
 };
 
 export async function getAllTournamentPredictions(): Promise<AllTournamentPredictionsResult> {
@@ -42,8 +42,7 @@ export async function getAllTournamentPredictions(): Promise<AllTournamentPredic
       user_id,
       points_earned,
       predicted_winner:teams!predicted_winner_id(id, name),
-      predicted_top_scorer:players!predicted_top_scorer_id(id, name),
-      user:users(username, email)
+      predicted_top_scorer:players!predicted_top_scorer_id(id, name)
     `,
     );
 
@@ -52,31 +51,35 @@ export async function getAllTournamentPredictions(): Promise<AllTournamentPredic
     return { status: "error" };
   }
 
-  const predictions = ((data ?? []) as unknown as TournamentPredictionRow[]).map(
-    (row) => {
-      const normalized = normalizeTournamentPrediction({
-        id: "",
-        user_id: row.user_id,
-        predicted_winner_id: "",
-        predicted_top_scorer_id: "",
-        points_earned: row.points_earned,
-        predicted_winner: row.predicted_winner,
-        predicted_top_scorer: row.predicted_top_scorer,
-      });
+  const rows = (data ?? []) as unknown as TournamentPredictionRow[];
+  const profiles = await fetchPublicProfilesByIds(
+    supabase,
+    rows.map((row) => row.user_id),
+  );
 
-      return {
-        userId: row.user_id,
-        displayName: getUserDisplayName({
-          username: row.user?.username ?? null,
-          email: row.user?.email ?? null,
-        }),
+  const predictions = rows.map((row) => {
+    const normalized = normalizeTournamentPrediction({
+      id: "",
+      user_id: row.user_id,
+      predicted_winner_id: "",
+      predicted_top_scorer_id: "",
+      points_earned: row.points_earned,
+      predicted_winner: row.predicted_winner,
+      predicted_top_scorer: row.predicted_top_scorer,
+    });
+    const profile = profiles.get(row.user_id);
+
+    return {
+      userId: row.user_id,
+      displayName: getUserDisplayName({
+        username: profile?.username ?? null,
+      }),
         winnerName: normalized.predicted_winner?.name ?? "—",
         topScorerName: normalized.predicted_top_scorer?.name ?? "—",
         pointsEarned: row.points_earned,
         isCurrentUser: row.user_id === user.id,
       };
-    },
-  );
+  });
 
   predictions.sort((left, right) => {
     if (left.isCurrentUser) return -1;

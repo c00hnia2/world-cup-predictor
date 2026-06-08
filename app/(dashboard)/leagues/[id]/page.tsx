@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { CopyInviteCode } from "@/components/leagues/CopyInviteCode";
 import { buildLeagueRankEntries } from "@/lib/build-league-ranking";
-import { normalizeLeagueMember } from "@/lib/normalize-league";
+import { fetchPublicProfilesByIds } from "@/lib/fetch-public-profiles";
 import type { League } from "@/types/league";
 import { createClient } from "@/utils/supabase/server";
 
@@ -55,16 +55,28 @@ async function getLeagueDetail(
 
   const { data: members, error: membersError } = await supabase
     .from("league_members")
-    .select("joined_at, user:users(id, username, email, total_points)")
-    .eq("league_id", leagueId)
-    .order("total_points", { ascending: false, foreignTable: "users" });
+    .select("joined_at, user_id")
+    .eq("league_id", leagueId);
 
   if (membersError) {
     console.error("[league detail] ranking:", membersError.message);
     return { status: "error" };
   }
 
-  const normalizedMembers = (members ?? []).map(normalizeLeagueMember);
+  const profiles = await fetchPublicProfilesByIds(
+    supabase,
+    (members ?? []).map((member) => member.user_id),
+  );
+
+  const normalizedMembers = (members ?? [])
+    .map((member) => ({
+      joined_at: member.joined_at,
+      user: profiles.get(member.user_id) ?? null,
+    }))
+    .sort(
+      (left, right) =>
+        (right.user?.total_points ?? 0) - (left.user?.total_points ?? 0),
+    );
 
   return {
     status: "ok",

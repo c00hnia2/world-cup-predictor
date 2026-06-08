@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import {
   getUserDisplayName,
   type LeaderboardEntry,
-  type UserProfile,
+  type PublicProfile,
 } from "@/types/user";
 import { createClient } from "@/utils/supabase/server";
 
@@ -24,8 +24,8 @@ async function getLeaderboard(): Promise<{
   } = await supabase.auth.getUser();
 
   const { data, error } = await supabase
-    .from("users")
-    .select("id, username, email, total_points")
+    .from("public_profiles")
+    .select("id, username, total_points")
     .order("total_points", { ascending: false });
 
   if (error) {
@@ -38,7 +38,7 @@ async function getLeaderboard(): Promise<{
     };
   }
 
-  const profiles = (data ?? []) as UserProfile[];
+  const profiles = (data ?? []) as PublicProfile[];
 
   if (profiles.length === 0) {
     return {

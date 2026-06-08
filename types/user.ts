@@ -1,17 +1,20 @@
-export interface UserProfile {
+export interface PublicProfile {
   id: string;
   username: string | null;
-  email: string | null;
   total_points: number | null;
 }
 
-export interface LeaderboardEntry extends UserProfile {
+export interface UserProfile extends PublicProfile {
+  email: string | null;
+}
+
+export interface LeaderboardEntry extends PublicProfile {
   displayName: string;
   position: number;
 }
 
 export function getUserDisplayName(
-  profile: Pick<UserProfile, "username" | "email">,
+  profile: Pick<PublicProfile, "username"> & { email?: string | null },
 ): string {
   if (
     typeof profile.username === "string" &&
