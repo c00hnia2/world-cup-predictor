@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { DashboardTabs } from "@/components/DashboardTabs";
 import { MatchDaySection } from "@/components/MatchDaySection";
+import { TournamentPredictionSection } from "@/components/TournamentPredictionSection";
 import { UserPredictionsSection } from "@/components/UserPredictionsSection";
 import { UserPredictionsSkeleton } from "@/components/UserPredictionsSkeleton";
 import { getUpcomingMatches } from "@/lib/get-upcoming-matches";
@@ -66,6 +67,17 @@ export default async function Home() {
           Typuj nadchodzące mecze i śledź swoje zapisane prognozy w jednym miejscu.
         </p>
       </header>
+
+      <Suspense
+        fallback={
+          <div
+            aria-hidden="true"
+            className="mb-10 h-48 animate-pulse rounded-2xl border border-zinc-200 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900"
+          />
+        }
+      >
+        <TournamentPredictionSection />
+      </Suspense>
 
       <DashboardTabs
         matchesContent={

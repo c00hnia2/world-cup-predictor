@@ -1,8 +1,13 @@
 import { AdminMatchForm } from "@/components/AdminMatchForm";
+import { AdminTournamentForm } from "@/components/AdminTournamentForm";
+import { getTournamentAdminData } from "@/lib/get-tournament-admin-data";
 import { getUpcomingMatches } from "@/lib/get-upcoming-matches";
 
 export default async function AdminPage() {
-  const { matches, hasError } = await getUpcomingMatches();
+  const [{ matches, hasError }, tournamentData] = await Promise.all([
+    getUpcomingMatches(),
+    getTournamentAdminData(),
+  ]);
 
   return (
     <>
@@ -18,6 +23,28 @@ export default async function AdminPage() {
           automatycznie.
         </p>
       </header>
+
+      <section className="mb-10 rounded-2xl border border-zinc-200 bg-white px-6 py-6 dark:border-zinc-700 dark:bg-zinc-900">
+        <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+          Wyniki turnieju
+        </h2>
+        <p className="mt-1 mb-6 text-sm text-zinc-600 dark:text-zinc-400">
+          Po zakończeniu mundialu ustaw faktycznego zwycięzcę i króla strzelców,
+          a następnie rozlicz typy turniejowe (10 pkt + 5 pkt).
+        </p>
+
+        {tournamentData.hasError ? (
+          <p className="text-rose-600 dark:text-rose-400">
+            Nie udało się pobrać danych turnieju.
+          </p>
+        ) : (
+          <AdminTournamentForm
+            teams={tournamentData.teams}
+            players={tournamentData.players}
+            results={tournamentData.results}
+          />
+        )}
+      </section>
 
       {hasError ? (
         <p className="text-rose-600 dark:text-rose-400">
