@@ -6,6 +6,7 @@ import {
 import { getCountryCode } from "@/lib/country-codes";
 import { isPredictionLocked } from "@/lib/prediction-lock";
 import { PredictionForm } from "@/components/PredictionForm";
+import { OtherPredictions } from "@/components/OtherPredictions";
 import { TeamFlag } from "@/components/TeamFlag";
 import type { Match } from "@/types/match";
 import type { ExistingMatchPrediction } from "@/types/prediction";
@@ -110,6 +111,10 @@ export function MatchCard({
           initialScoreB={existingPrediction?.predicted_score_b}
           hasExistingPrediction={hasExistingPrediction}
         />
+      </div>
+
+      <div className="border-t border-zinc-100 pt-3 dark:border-zinc-800/80">
+        <OtherPredictions matchId={match.id} isLocked={isLocked} />
       </div>
     </article>
   );

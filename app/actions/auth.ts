@@ -9,6 +9,7 @@ import {
   validatePassword,
   validateUsername,
 } from "@/lib/auth-validation";
+import { SITE_URL } from "@/lib/site";
 import type { AuthFormState } from "@/types/auth";
 import { createClient } from "@/utils/supabase/server";
 
@@ -37,7 +38,7 @@ export async function register(
   }
 
   const supabase = await createClient();
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const siteUrl = SITE_URL;
   const trimmedEmail = email.trim();
   const trimmedUsername = username.trim();
 

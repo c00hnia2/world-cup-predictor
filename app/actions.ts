@@ -6,6 +6,10 @@ import {
   canSubmitPrediction,
   getPredictionLockMessage,
 } from "@/lib/prediction-lock";
+import {
+  getMatchPredictions,
+  type MatchPredictionsResult,
+} from "@/lib/get-match-predictions";
 import type { PredictionFormState } from "@/types/prediction";
 
 // Mapuje surowe błędy bazy na bezpieczne komunikaty dla użytkownika.
@@ -130,4 +134,16 @@ export async function submitPrediction(
     status: "success",
     message: isUpdate ? "Typ zaktualizowany!" : "Typ zapisany!",
   };
+}
+
+// Typy innych graczy pobieramy na żądanie (po kliknięciu), żeby nie ładować
+// wszystkich typów dla każdego meczu przy renderze dashboardu.
+export async function fetchMatchPredictions(
+  matchId: string,
+): Promise<MatchPredictionsResult> {
+  if (typeof matchId !== "string" || matchId.length === 0) {
+    return { status: "error" };
+  }
+
+  return getMatchPredictions(matchId);
 }

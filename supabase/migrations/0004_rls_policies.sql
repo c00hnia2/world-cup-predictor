@@ -58,9 +58,13 @@ create policy "Only admins can modify matches"
 -- ---------------------------------------------------------------------------
 -- predictions
 -- ---------------------------------------------------------------------------
+-- Typy wszystkich graczy są jawne: każdy zalogowany użytkownik może czytać
+-- wszystkie typy (są pokazywane bezpośrednio pod meczem). Patrz
+-- lib/get-match-predictions.ts.
 drop policy if exists "Users can view own predictions" on public.predictions;
-create policy "Users can view own predictions"
-  on public.predictions for select using (auth.uid() = user_id);
+drop policy if exists "Authenticated users can view all predictions" on public.predictions;
+create policy "Authenticated users can view all predictions"
+  on public.predictions for select using (auth.uid() is not null);
 
 drop policy if exists "Users can insert own predictions" on public.predictions;
 create policy "Users can insert own predictions"
