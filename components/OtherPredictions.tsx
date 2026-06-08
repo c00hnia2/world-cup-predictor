@@ -6,7 +6,6 @@ import type { MatchPredictionEntry } from "@/lib/get-match-predictions";
 
 interface OtherPredictionsProps {
   matchId: string;
-  isLocked: boolean;
 }
 
 type LoadState =
@@ -55,18 +54,10 @@ function PredictionRow({ entry }: { entry: MatchPredictionEntry }) {
   );
 }
 
-export function OtherPredictions({ matchId, isLocked }: OtherPredictionsProps) {
+export function OtherPredictions({ matchId }: OtherPredictionsProps) {
   const [open, setOpen] = useState(false);
   const [loadState, setLoadState] = useState<LoadState>({ status: "idle" });
   const [isPending, startTransition] = useTransition();
-
-  if (!isLocked) {
-    return (
-      <p className="text-center text-xs text-zinc-500 dark:text-zinc-400">
-        Typy innych graczy odsłonią się po zamknięciu typowania.
-      </p>
-    );
-  }
 
   function handleToggle() {
     const next = !open;

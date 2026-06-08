@@ -114,7 +114,7 @@ export function MatchCard({
       </div>
 
       <div className="border-t border-zinc-100 pt-3 dark:border-zinc-800/80">
-        <OtherPredictions matchId={match.id} isLocked={isLocked} />
+        <OtherPredictions matchId={match.id} />
       </div>
     </article>
   );
