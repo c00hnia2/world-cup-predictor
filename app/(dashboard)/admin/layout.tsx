@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
-import { isAdminRole } from "@/types/role";
+import { fetchIsAdmin } from "@/lib/require-admin";
 
 export default async function AdminLayout({
   children,
@@ -17,18 +17,7 @@ export default async function AdminLayout({
     redirect("/login?next=/admin");
   }
 
-  const { data: profile, error } = await supabase
-    .from("users")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  if (error) {
-    console.error("[admin/layout] role fetch:", error.message);
-    redirect("/");
-  }
-
-  if (!isAdminRole(profile?.role)) {
+  if (!(await fetchIsAdmin(supabase, user.id))) {
     redirect("/");
   }
 

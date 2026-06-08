@@ -5,6 +5,26 @@ export type AdminAccessResult =
   | { authorized: true; userId: string }
   | { authorized: false; message: string };
 
+// Wspólne źródło prawdy o roli admina — używane przez akcje serwerowe
+// (requireAdminAccess) oraz layout panelu admina (app/(dashboard)/admin/layout.tsx).
+export async function fetchIsAdmin(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+): Promise<boolean> {
+  const { data: profile, error } = await supabase
+    .from("users")
+    .select("role")
+    .eq("id", userId)
+    .single();
+
+  if (error) {
+    console.error("[fetchIsAdmin] profile fetch:", error.message);
+    return false;
+  }
+
+  return isAdminRole(profile?.role);
+}
+
 export async function requireAdminAccess(): Promise<AdminAccessResult> {
   const supabase = await createClient();
 
@@ -17,18 +37,7 @@ export async function requireAdminAccess(): Promise<AdminAccessResult> {
     return { authorized: false, message: "Brak uprawnień." };
   }
 
-  const { data: profile, error: profileError } = await supabase
-    .from("users")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  if (profileError) {
-    console.error("[requireAdminAccess] profile fetch:", profileError.message);
-    return { authorized: false, message: "Brak uprawnień." };
-  }
-
-  if (!isAdminRole(profile?.role)) {
+  if (!(await fetchIsAdmin(supabase, user.id))) {
     return { authorized: false, message: "Brak uprawnień." };
   }
 

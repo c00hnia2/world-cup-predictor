@@ -19,7 +19,8 @@ function mapPredictionError(message: string): string {
     return "Sesja wygasła. Zaloguj się ponownie.";
   }
 
-  // Blokada typowania egzekwowana triggerem w bazie (hardening-rls.sql).
+  // Blokada typowania egzekwowana triggerem w bazie
+  // (protect_prediction_write — supabase/migrations/0005_protection_triggers.sql).
   if (message.includes("Typowanie jest zamknięte")) {
     return "Typowanie jest zamknięte dla tego meczu.";
   }
