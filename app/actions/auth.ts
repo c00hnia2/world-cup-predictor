@@ -13,6 +13,40 @@ import { SITE_URL } from "@/lib/site";
 import type { AuthFormState } from "@/types/auth";
 import { createClient } from "@/utils/supabase/server";
 
+// Escapuje znaki specjalne wzorca ILIKE (_ i % to dzikie karty, \ to escape),
+// dzięki czemu np. "jan_kowalski" jest dopasowywane dosłownie, a nie jako wzorzec.
+function escapeLikePattern(value: string): string {
+  return value.replace(/[\\%_]/g, (char) => `\\${char}`);
+}
+
+async function isUsernameTaken(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  username: string,
+): Promise<boolean> {
+  const { data, error } = await supabase
+    .from("public_profiles")
+    .select("id")
+    .ilike("username", escapeLikePattern(username))
+    .limit(1);
+
+  if (error) {
+    // Błąd odczytu nie powinien blokować rejestracji — unikalny indeks w bazie
+    // i tak ochroni przed duplikatem.
+    console.error("[register] username check error:", error.message);
+    return false;
+  }
+
+  return (data?.length ?? 0) > 0;
+}
+
+function isUsernameTakenError(error: { message?: string }): boolean {
+  const message = (error.message ?? "").toLowerCase();
+  return (
+    message.includes("username_taken") ||
+    message.includes("users_username_lower_key")
+  );
+}
+
 export async function register(
   prevState: AuthFormState,
   formData: FormData,
@@ -42,6 +76,19 @@ export async function register(
   const trimmedEmail = email.trim();
   const trimmedUsername = username.trim();
 
+  // Wczesne, przyjazne sprawdzenie zajętości nicku (case-insensitive).
+  // Twardą gwarancję unikalności daje unikalny indeks w bazie (0011).
+  const usernameTaken = await isUsernameTaken(supabase, trimmedUsername);
+  if (usernameTaken) {
+    return {
+      status: "error",
+      message: "Popraw błędy w formularzu.",
+      fieldErrors: {
+        username: "Ta nazwa użytkownika jest już zajęta.",
+      },
+    };
+  }
+
   const { data, error } = await supabase.auth.signUp({
     email: trimmedEmail,
     password,
@@ -56,6 +103,18 @@ export async function register(
 
   if (error) {
     console.error("[register] signUp error:", error.message);
+
+    // Wyścig: nick zajęty między pre-checkiem a zapisem → trigger zgłasza błąd.
+    if (isUsernameTakenError(error)) {
+      return {
+        status: "error",
+        message: "Popraw błędy w formularzu.",
+        fieldErrors: {
+          username: "Ta nazwa użytkownika jest już zajęta.",
+        },
+      };
+    }
+
     return {
       status: "error",
       message: translateAuthError(error),
