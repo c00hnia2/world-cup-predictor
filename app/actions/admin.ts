@@ -86,3 +86,97 @@ export async function resolveMatch(
         : "Mecz rozliczony (brak typów do punktacji).",
   };
 }
+
+export type AdminActionResult =
+  | { success: true; message: string }
+  | { success: false; message: string };
+
+export async function saveTournamentResults(
+  actualWinnerId: string,
+  actualTopScorerId: string,
+): Promise<AdminActionResult> {
+  const adminCheck = await requireAdminAccess();
+  if (!adminCheck.authorized) {
+    return { success: false, message: adminCheck.message };
+  }
+
+  if (!actualWinnerId || !actualTopScorerId) {
+    return {
+      success: false,
+      message: "Wybierz faktycznego zwycięzcę i króla strzelców.",
+    };
+  }
+
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("tournament_results")
+    .update({
+      actual_winner_id: actualWinnerId,
+      actual_top_scorer_id: actualTopScorerId,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", 1);
+
+  if (error) {
+    console.error("[saveTournamentResults]", error.message);
+    return {
+      success: false,
+      message: "Nie udało się zapisać wyników turnieju.",
+    };
+  }
+
+  revalidatePath("/admin");
+
+  return {
+    success: true,
+    message: "Wyniki turnieju zapisane.",
+  };
+}
+
+export async function resolveTournamentPredictions(): Promise<AdminActionResult> {
+  const adminCheck = await requireAdminAccess();
+  if (!adminCheck.authorized) {
+    return { success: false, message: adminCheck.message };
+  }
+
+  const supabase = await createClient();
+
+  const { data: affectedCount, error } = await supabase.rpc(
+    "resolve_tournament_predictions",
+  );
+
+  if (error) {
+    console.error("[resolveTournamentPredictions] rpc:", error.message);
+
+    if (error.message.includes("Ustaw faktycznego zwycięzcę")) {
+      return {
+        success: false,
+        message:
+          "Ustaw faktycznego zwycięzcę i króla strzelców przed rozliczeniem.",
+      };
+    }
+
+    if (error.message.includes("Brak uprawnień")) {
+      return { success: false, message: "Brak uprawnień." };
+    }
+
+    return {
+      success: false,
+      message: "Nie udało się rozliczyć typów turniejowych.",
+    };
+  }
+
+  revalidatePath("/");
+  revalidatePath("/admin");
+  revalidatePath("/leaderboard");
+
+  const count = typeof affectedCount === "number" ? affectedCount : 0;
+  return {
+    success: true,
+    message:
+      count > 0
+        ? `Typy turniejowe rozliczone. Zaktualizowano ${count} typów (max 15 pkt na użytkownika).`
+        : "Typy turniejowe rozliczone (brak typów do punktacji).",
+  };
+}
