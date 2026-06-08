@@ -1,12 +1,15 @@
 # 🏆 World Cup Predictor
 
 A full-stack prediction game for the 2026 World Cup, built with Next.js (App Router),
-React Server Components and Supabase. Users predict match scores, climb the global
-leaderboard and compete with friends in private leagues.
+React Server Components and Supabase. Users predict match scores, pick the tournament
+winner and top scorer, climb the global leaderboard and compete with friends in
+private leagues.
 
 **🌐 Live demo:** [wcp-app.vercel.app](https://wcp-app.vercel.app/)
 
 ## 📝 Scoring
+
+### Match predictions
 
 | Result | Points |
 |--------|--------|
@@ -14,17 +17,34 @@ leaderboard and compete with friends in private leagues.
 | Correct outcome, different score (winner or draw) | **1** |
 | Wrong outcome | **0** |
 
-Scoring is computed atomically in the database (`resolve_match` RPC) and
-`total_points` is always recalculated from scratch, so it is safe to re-run.
+Match scoring is computed atomically in the database (`resolve_match` RPC).
+
+### Tournament predictions
+
+| Result | Points |
+|--------|--------|
+| Correct tournament winner | **10** |
+| Correct top scorer (Golden Boot) | **5** |
+
+Tournament scoring is computed atomically via the `resolve_tournament_predictions`
+RPC after the admin sets the actual winner and top scorer.
+
+`total_points` always includes both match and tournament points and is recalculated
+from scratch, so scoring RPCs are safe to re-run.
 
 ## ✨ Features
 
 - **Authentication** — email/password sign-up with email verification (Supabase Auth).
-- **Predictions** — submit and edit scores until **15 minutes before kickoff** (lock
-  enforced both in the UI and in the database).
+- **Match predictions** — submit and edit scores until **15 minutes before kickoff**
+  (lock enforced both in the UI and in the database).
+- **Tournament predictions** — pick the World Cup winner and top scorer before the
+  first match kicks off; searchable country and player pickers.
+- **Other players' picks** — view match and tournament predictions from other users
+  directly on the dashboard.
 - **Global leaderboard** — ranking of all players.
 - **Private leagues** — create a league and invite friends with a 6-character code.
-- **Admin panel** — resolve matches and trigger automatic scoring.
+- **Admin panel** — resolve matches, set tournament results and trigger automatic
+  scoring.
 
 ## 🛠️ Tech Stack
 
@@ -78,6 +98,10 @@ supabase/migrations/0002_auth_and_roles.sql
 supabase/migrations/0003_functions.sql
 supabase/migrations/0004_rls_policies.sql
 supabase/migrations/0005_protection_triggers.sql
+supabase/migrations/0006_match_predictions_rpc.sql
+supabase/migrations/0007_prediction_visibility.sql
+supabase/migrations/0008_tournament_predictions.sql
+supabase/migrations/0009_tournament_prediction_visibility.sql
 ```
 
 See [`supabase/migrations/README.md`](supabase/migrations/README.md) for details.
@@ -115,12 +139,15 @@ For E2E, install browsers once: `npx playwright install`.
 
 ## 🔒 Security Model
 
-- `total_points` and `points_earned` can only be written by the admin-only
-  `resolve_match` RPC — never directly by players.
-- The prediction lock (15 min before kickoff) is enforced by a database trigger,
-  so it cannot be bypassed by calling the API directly.
-- `matches` / `teams` are public to read, writable by admins only.
-- Predictions and leagues are private to their owners/members via RLS.
+- `total_points` and `points_earned` can only be written by admin-only RPCs
+  (`resolve_match`, `resolve_tournament_predictions`) — never directly by players.
+- The match prediction lock (15 min before kickoff) and the tournament prediction
+  lock (before the first match starts) are enforced by database triggers, so they
+  cannot be bypassed by calling the API directly.
+- `matches` / `teams` / `players` are public to read, writable by admins only.
+- Match and tournament predictions are readable by all authenticated users; writes
+  are limited to the owner (admins can update tournament results and scoring).
+- Leagues are private to their members via RLS.
 - Security headers + CSP are configured in `next.config.ts`.
 
 ## 🧪 Testing & CI

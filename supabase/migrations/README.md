@@ -10,6 +10,10 @@ w Supabase → SQL Editor (lub `supabase db push`, jeśli używasz CLI).
 | `0003_functions.sql` | `is_league_member()`, `find_league_id_by_invite_code()`, atomowy RPC `resolve_match()`. |
 | `0004_rls_policies.sql` | Wszystkie polityki RLS (odczyt publiczny meczów/drużyn, zapis tylko admin, prywatność typów/lig). |
 | `0005_protection_triggers.sql` | Triggery ochronne: blokada zmiany `total_points`/`role`, blokada locka typowania i ochrona `points_earned`. |
+| `0006_match_predictions_rpc.sql` | RPC `get_match_predictions()` — historycznie ukrywało typy do 15 min przed meczem (usunięte w `0007`). |
+| `0007_prediction_visibility.sql` | Jawne typy meczowe — wszyscy zalogowani widzą typy innych graczy; usunięcie RPC z `0006`. |
+| `0008_tournament_predictions.sql` | Tabele `players`, `tournament_predictions`, `tournament_results`; seed zawodników; RLS; trigger locka turniejowego; RPC `resolve_tournament_predictions()`; aktualizacja `resolve_match()` o punkty turniejowe. |
+| `0009_tournament_prediction_visibility.sql` | Jawne typy turniejowe — wszyscy zalogowani widzą typy turniejowe innych graczy. |
 
 ## Zasady
 
@@ -24,7 +28,11 @@ w Supabase → SQL Editor (lub `supabase db push`, jeśli używasz CLI).
 
 ## Model bezpieczeństwa (skrót)
 
-- `total_points` i `points_earned` zapisuje **wyłącznie** RPC `resolve_match` (admin).
-- Blokada typowania (15 min przed meczem) jest egzekwowana w bazie (trigger), więc
-  nie da się jej ominąć bezpośrednim wywołaniem PostgREST.
-- `matches`/`teams` są publiczne do odczytu, modyfikowalne tylko przez admina.
+- `total_points` i `points_earned` zapisują **wyłącznie** RPC admina:
+  `resolve_match` (mecze) oraz `resolve_tournament_predictions` (typ turniejowy).
+- Blokada typowania meczowego (15 min przed meczem) i turniejowego (przed pierwszym
+  meczem) jest egzekwowana w bazie (triggery), więc nie da się ich ominąć bezpośrednim
+  wywołaniem PostgREST.
+- `matches`/`teams`/`players` są publiczne do odczytu, modyfikowalne tylko przez admina.
+- Typy meczowe i turniejowe są widoczne dla wszystkich zalogowanych użytkowników;
+  zapis ograniczony do właściciela typu.
