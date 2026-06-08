@@ -1,29 +1,11 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 
-const isDev = process.env.NODE_ENV === "development";
-
-// Content Security Policy.
-// Uwaga: 'unsafe-inline' dla script-src jest wymagane przez bootstrap/hydrację
-// Next.js bez nonce. Docelowo można przejść na nonce + 'strict-dynamic'
-// wstrzykiwane w middleware. 'unsafe-eval' włączamy tylko w dev (React Refresh).
-const contentSecurityPolicy = [
-  "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: https://flagcdn.com",
-  "font-src 'self'",
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
-  "frame-ancestors 'none'",
-  "base-uri 'self'",
-  "form-action 'self'",
-  "object-src 'none'",
-  "upgrade-insecure-requests",
-]
-  .join("; ");
-
+// Uwaga: Content-Security-Policy NIE jest tu ustawiane — budujemy je per-request
+// z nonce w proxy.ts (lib/csp.ts), co pozwala wyeliminować 'unsafe-inline' dla
+// skryptów w produkcji. Pozostałe nagłówki są statyczne (te same dla każdej
+// odpowiedzi), więc zostają w konfiguracji.
 const securityHeaders = [
-  { key: "Content-Security-Policy", value: contentSecurityPolicy },
   {
     key: "Strict-Transport-Security",
     value: "max-age=63072000; includeSubDomains; preload",

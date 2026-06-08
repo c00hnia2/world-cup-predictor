@@ -9,9 +9,14 @@ export type SessionUpdateResult = {
 
 export async function updateSession(
   request: NextRequest,
+  requestHeaders?: Headers,
 ): Promise<SessionUpdateResult> {
+  // Przekazujemy zmodyfikowane nagłówki żądania (np. z nonce CSP) dalej do
+  // renderu, żeby Next mógł odczytać nonce i doczepić go do swoich skryptów.
+  const headers = requestHeaders ?? request.headers;
+
   let supabaseResponse = NextResponse.next({
-    request,
+    request: { headers },
   });
 
   const supabase = createServerClient(
@@ -27,7 +32,7 @@ export async function updateSession(
             request.cookies.set(name, value),
           );
           supabaseResponse = NextResponse.next({
-            request,
+            request: { headers },
           });
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options),

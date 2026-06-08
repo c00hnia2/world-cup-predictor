@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { LoginForm } from "@/components/LoginForm";
 
+// Render per-request — wymagane, by skrypty dostały nonce CSP z proxy.ts.
+// Bez tego strona byłaby statyczna, a jej skrypty (bez nonce) zostałyby
+// zablokowane przez script-src 'strict-dynamic'.
+export const dynamic = "force-dynamic";
+
 export default function LoginPage() {
   return (
     <div className="min-h-full bg-zinc-50 dark:bg-zinc-950">
