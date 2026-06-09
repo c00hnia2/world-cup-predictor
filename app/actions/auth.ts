@@ -9,6 +9,12 @@ import {
   validatePassword,
   validateUsername,
 } from "@/lib/auth-validation";
+import { getClientIpFromHeaders } from "@/lib/get-client-ip";
+import {
+  checkRateLimit,
+  getRateLimitMessage,
+  RATE_LIMITS,
+} from "@/lib/rate-limit";
 import { SITE_URL } from "@/lib/site";
 import type { AuthFormState } from "@/types/auth";
 import { createClient } from "@/utils/supabase/server";
@@ -51,6 +57,18 @@ export async function register(
   prevState: AuthFormState,
   formData: FormData,
 ): Promise<AuthFormState> {
+  const registerRateLimit = checkRateLimit(
+    "register",
+    await getClientIpFromHeaders(),
+    RATE_LIMITS.register,
+  );
+  if (!registerRateLimit.allowed) {
+    return {
+      status: "error",
+      message: getRateLimitMessage(registerRateLimit),
+    };
+  }
+
   const email = String(formData.get("email") ?? "");
   const username = String(formData.get("username") ?? "");
   const password = String(formData.get("password") ?? "");
@@ -134,6 +152,18 @@ export async function login(
   prevState: AuthFormState,
   formData: FormData,
 ): Promise<AuthFormState> {
+  const loginRateLimit = checkRateLimit(
+    "login",
+    await getClientIpFromHeaders(),
+    RATE_LIMITS.login,
+  );
+  if (!loginRateLimit.allowed) {
+    return {
+      status: "error",
+      message: getRateLimitMessage(loginRateLimit),
+    };
+  }
+
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
 
