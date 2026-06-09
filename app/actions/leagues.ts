@@ -3,6 +3,12 @@
 import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { getClientIpFromHeaders } from "@/lib/get-client-ip";
+import {
+  checkRateLimit,
+  getRateLimitMessage,
+  RATE_LIMITS,
+} from "@/lib/rate-limit";
 import {
   INVITE_CODE_LENGTH,
   INVITE_CODE_PATTERN,
@@ -173,6 +179,18 @@ export async function joinLeague(
 
   const normalizedCode = inviteCodeInput.trim().toUpperCase();
   const { supabase, user } = await requireAuthenticatedUser();
+
+  const inviteLookupRateLimit = checkRateLimit(
+    "invite-code-lookup",
+    await getClientIpFromHeaders(),
+    RATE_LIMITS.inviteCodeLookup,
+  );
+  if (!inviteLookupRateLimit.allowed) {
+    return {
+      status: "error",
+      message: getRateLimitMessage(inviteLookupRateLimit),
+    };
+  }
 
   const { data: leagueId, error: lookupError } = await supabase.rpc(
     "find_league_id_by_invite_code",
