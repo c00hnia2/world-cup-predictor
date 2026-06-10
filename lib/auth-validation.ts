@@ -1,3 +1,5 @@
+import { isDisposableEmail } from "disposable-email-domains-js";
+
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const USERNAME_PATTERN = /^[a-zA-Z0-9_]{3,30}$/;
 
@@ -10,6 +12,10 @@ export function validateEmail(email: string): string | null {
 
   if (!EMAIL_PATTERN.test(trimmed)) {
     return "Podaj prawidłowy adres email.";
+  }
+
+  if (isDisposableEmail(trimmed)) {
+    return "Rejestracja przy użyciu tymczasowych adresów e-mail jest zablokowana.";
   }
 
   return null;
