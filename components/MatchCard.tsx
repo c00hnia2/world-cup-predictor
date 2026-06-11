@@ -16,6 +16,7 @@ interface MatchCardProps {
   /** Gdy mecz jest w sekcji dnia — na karcie tylko godzina. */
   showTimeOnly?: boolean;
   existingPrediction?: ExistingMatchPrediction | null;
+  variant?: "upcoming" | "finished";
 }
 
 interface TeamLabelProps {
@@ -67,31 +68,81 @@ function TeamLabel({ name, rawName, align }: TeamLabelProps) {
   );
 }
 
+function FinishedMatchSummary({
+  match,
+  existingPrediction,
+}: {
+  match: Match;
+  existingPrediction: ExistingMatchPrediction | null;
+}) {
+  const hasOfficialScore =
+    typeof match.score_a === "number" && typeof match.score_b === "number";
+
+  return (
+    <div className="flex flex-col gap-3 border-t border-zinc-100 pt-3 dark:border-zinc-800/80">
+      {hasOfficialScore ? (
+        <div className="rounded-xl bg-zinc-50 px-4 py-3 text-center dark:bg-zinc-800/60">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+            Wynik meczu
+          </p>
+          <p className="mt-1 font-mono text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+            {match.score_a} – {match.score_b}
+          </p>
+        </div>
+      ) : null}
+
+      {existingPrediction ? (
+        <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
+          Twój typ:{" "}
+          <span className="font-mono font-semibold text-emerald-700 dark:text-emerald-300">
+            {existingPrediction.predicted_score_a} –{" "}
+            {existingPrediction.predicted_score_b}
+          </span>
+        </p>
+      ) : (
+        <p className="text-center text-xs text-zinc-500 dark:text-zinc-400">
+          Nie zatypowałeś tego meczu.
+        </p>
+      )}
+    </div>
+  );
+}
+
 export function MatchCard({
   match,
   showTimeOnly = false,
   existingPrediction = null,
+  variant = "upcoming",
 }: MatchCardProps) {
   const teamARaw = match.team_a?.name ?? "—";
   const teamBRaw = match.team_b?.name ?? "—";
   const teamA = formatTeamDisplayName(teamARaw);
   const teamB = formatTeamDisplayName(teamBRaw);
+  const isFinished = variant === "finished";
   const isLocked = isPredictionLocked(match.kickoff_time);
   const hasExistingPrediction = existingPrediction !== null;
 
   return (
-    <article className="group relative flex h-full flex-col gap-3 overflow-hidden rounded-2xl border border-zinc-200/70 bg-white p-4 shadow-sm ring-1 ring-transparent transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-300/60 hover:shadow-xl hover:shadow-emerald-900/5 hover:ring-emerald-500/10 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-emerald-500/30 dark:hover:shadow-black/30 sm:p-5">
+    <article className="group relative flex h-fit w-full flex-col gap-3 overflow-hidden rounded-2xl border border-zinc-200/70 bg-white p-4 shadow-sm ring-1 ring-transparent transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-300/60 hover:shadow-xl hover:shadow-emerald-900/5 hover:ring-emerald-500/10 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-emerald-500/30 dark:hover:shadow-black/30 sm:p-5">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
       />
 
-      <div className="grid w-full grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-x-2">
-        <TeamLabel name={teamA} rawName={teamARaw} align="right" />
-        <span className="shrink-0 px-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-          vs
-        </span>
-        <TeamLabel name={teamB} rawName={teamBRaw} align="left" />
+      <div className="flex items-start justify-between gap-2">
+        <div className="grid min-w-0 flex-1 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-x-2">
+          <TeamLabel name={teamA} rawName={teamARaw} align="right" />
+          <span className="shrink-0 px-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+            vs
+          </span>
+          <TeamLabel name={teamB} rawName={teamBRaw} align="left" />
+        </div>
+
+        {isFinished ? (
+          <span className="shrink-0 rounded-full bg-zinc-100 px-2.5 py-0.5 text-[10px] font-semibold text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+            Rozegrany
+          </span>
+        ) : null}
       </div>
 
       <time
@@ -103,18 +154,25 @@ export function MatchCard({
           : formatKickoffTime(match.kickoff_time)}
       </time>
 
-      <div className="mt-auto border-t border-zinc-100 pt-3 dark:border-zinc-800/80">
-        <PredictionForm
-          matchId={match.id}
-          isLocked={isLocked}
-          initialScoreA={existingPrediction?.predicted_score_a}
-          initialScoreB={existingPrediction?.predicted_score_b}
-          hasExistingPrediction={hasExistingPrediction}
+      {isFinished ? (
+        <FinishedMatchSummary
+          match={match}
+          existingPrediction={existingPrediction}
         />
-      </div>
+      ) : (
+        <div className="border-t border-zinc-100 pt-3 dark:border-zinc-800/80">
+          <PredictionForm
+            matchId={match.id}
+            isLocked={isLocked}
+            initialScoreA={existingPrediction?.predicted_score_a}
+            initialScoreB={existingPrediction?.predicted_score_b}
+            hasExistingPrediction={hasExistingPrediction}
+          />
+        </div>
+      )}
 
       <div className="border-t border-zinc-100 pt-3 dark:border-zinc-800/80">
-        <OtherPredictions matchId={match.id} />
+        <OtherPredictions matchId={match.id} showZeroPoints={isFinished} />
       </div>
     </article>
   );

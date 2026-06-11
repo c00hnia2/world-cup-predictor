@@ -6,6 +6,7 @@ interface MatchDaySectionProps {
   label: string;
   matches: Match[];
   predictionsByMatchId?: Record<string, ExistingMatchPrediction>;
+  variant?: "upcoming" | "finished";
 }
 
 function pluralizeMecz(count: number): string {
@@ -22,6 +23,7 @@ export function MatchDaySection({
   label,
   matches,
   predictionsByMatchId = {},
+  variant = "upcoming",
 }: MatchDaySectionProps) {
   return (
     <section className="scroll-mt-6">
@@ -34,13 +36,14 @@ export function MatchDaySection({
         </span>
       </div>
 
-      <ul className="grid list-none gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="grid list-none items-start gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {matches.map((match) => (
-          <li key={match.id}>
+          <li key={match.id} className="h-fit w-full">
             <MatchCard
               match={match}
               showTimeOnly
               existingPrediction={predictionsByMatchId[match.id] ?? null}
+              variant={variant}
             />
           </li>
         ))}
