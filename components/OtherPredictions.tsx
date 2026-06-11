@@ -6,6 +6,8 @@ import type { MatchPredictionEntry } from "@/lib/get-match-predictions";
 
 interface OtherPredictionsProps {
   matchId: string;
+  /** W zakończonych meczach pokazuj też +0 pkt po rozliczeniu. */
+  showZeroPoints?: boolean;
 }
 
 type LoadState =
@@ -29,7 +31,17 @@ function ChevronIcon({ open }: { open: boolean }) {
   );
 }
 
-function PredictionRow({ entry }: { entry: MatchPredictionEntry }) {
+function PredictionRow({
+  entry,
+  showZeroPoints,
+}: {
+  entry: MatchPredictionEntry;
+  showZeroPoints: boolean;
+}) {
+  const showPoints =
+    typeof entry.pointsEarned === "number" &&
+    (entry.pointsEarned > 0 || showZeroPoints);
+
   return (
     <li className="flex items-center justify-between gap-3 rounded-xl bg-zinc-50 px-3 py-2 dark:bg-zinc-800/60">
       <span className="flex min-w-0 items-center gap-2">
@@ -44,8 +56,14 @@ function PredictionRow({ entry }: { entry: MatchPredictionEntry }) {
       </span>
       <span className="shrink-0 font-mono text-sm font-bold text-zinc-900 dark:text-zinc-50">
         {entry.predictedScoreA} – {entry.predictedScoreB}
-        {typeof entry.pointsEarned === "number" ? (
-          <span className="ml-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+        {showPoints ? (
+          <span
+            className={`ml-2 text-xs font-semibold ${
+              (entry.pointsEarned ?? 0) > 0
+                ? "text-emerald-600 dark:text-emerald-400"
+                : "text-zinc-500 dark:text-zinc-400"
+            }`}
+          >
             +{entry.pointsEarned} pkt
           </span>
         ) : null}
@@ -54,7 +72,10 @@ function PredictionRow({ entry }: { entry: MatchPredictionEntry }) {
   );
 }
 
-export function OtherPredictions({ matchId }: OtherPredictionsProps) {
+export function OtherPredictions({
+  matchId,
+  showZeroPoints = false,
+}: OtherPredictionsProps) {
   const [open, setOpen] = useState(false);
   const [loadState, setLoadState] = useState<LoadState>({ status: "idle" });
   const [isPending, startTransition] = useTransition();
@@ -119,7 +140,11 @@ export function OtherPredictions({ matchId }: OtherPredictionsProps) {
             loadState.predictions.length > 0 ? (
               <ul className="flex list-none flex-col gap-1.5">
                 {loadState.predictions.map((entry) => (
-                  <PredictionRow key={entry.userId} entry={entry} />
+                  <PredictionRow
+                    key={entry.userId}
+                    entry={entry}
+                    showZeroPoints={showZeroPoints}
+                  />
                 ))}
               </ul>
             ) : (
