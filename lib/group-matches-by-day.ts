@@ -42,7 +42,11 @@ export interface MatchesByDay {
   matches: Match[];
 }
 
-export function groupMatchesByDay(matches: Match[]): MatchesByDay[] {
+export function groupMatchesByDay(
+  matches: Match[],
+  options?: { order?: "asc" | "desc" },
+): MatchesByDay[] {
+  const order = options?.order ?? "asc";
   const groups = new Map<string, MatchesByDay>();
 
   for (const match of matches) {
@@ -59,7 +63,9 @@ export function groupMatchesByDay(matches: Match[]): MatchesByDay[] {
     groups.get(sortKey)!.matches.push(match);
   }
 
-  return Array.from(groups.values()).sort((a, b) =>
+  const sorted = Array.from(groups.values()).sort((a, b) =>
     a.sortKey.localeCompare(b.sortKey),
   );
+
+  return order === "desc" ? sorted.reverse() : sorted;
 }

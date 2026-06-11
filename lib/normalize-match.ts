@@ -6,6 +6,8 @@ export type MatchRow = {
   id: string;
   kickoff_time: string;
   status: string;
+  score_a?: number | null;
+  score_b?: number | null;
   team_a: TeamRelation;
   team_b: TeamRelation;
 };
@@ -21,6 +23,8 @@ export function normalizeMatch(row: MatchRow): Match {
     id: row.id,
     kickoff_time: row.kickoff_time,
     status: row.status,
+    score_a: row.score_a ?? null,
+    score_b: row.score_b ?? null,
     team_a: normalizeTeam(row.team_a),
     team_b: normalizeTeam(row.team_b),
   };
