@@ -4,6 +4,7 @@ import { MatchDaySection } from "@/components/MatchDaySection";
 import { TournamentPredictionSection } from "@/components/TournamentPredictionSection";
 import { UserPredictionsSection } from "@/components/UserPredictionsSection";
 import { UserPredictionsSkeleton } from "@/components/UserPredictionsSkeleton";
+import { getFinishedMatches } from "@/lib/get-finished-matches";
 import { getUpcomingMatches } from "@/lib/get-upcoming-matches";
 import { getUserPredictionsByMatchId } from "@/lib/get-user-predictions-by-match";
 import { groupMatchesByDay } from "@/lib/group-matches-by-day";
@@ -46,13 +47,60 @@ function UpcomingMatchesContent({
   );
 }
 
+function FinishedMatchesContent({
+  hasError,
+  matchesByDay,
+  showEmptyState,
+  predictionsByMatchId,
+}: {
+  hasError: boolean;
+  matchesByDay: ReturnType<typeof groupMatchesByDay>;
+  showEmptyState: boolean;
+  predictionsByMatchId: Record<string, { predicted_score_a: number; predicted_score_b: number }>;
+}) {
+  if (showEmptyState) {
+    return (
+      <p
+        role="status"
+        className="rounded-2xl border border-dashed border-zinc-300 bg-white px-6 py-12 text-center text-zinc-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400"
+      >
+        {hasError
+          ? "Nie udało się pobrać listy zakończonych meczów."
+          : "Brak zakończonych meczów"}
+      </p>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-14 sm:gap-16">
+      {matchesByDay.map((day) => (
+        <MatchDaySection
+          key={day.sortKey}
+          label={day.label}
+          matches={day.matches}
+          predictionsByMatchId={predictionsByMatchId}
+          variant="finished"
+        />
+      ))}
+    </div>
+  );
+}
+
 export default async function Home() {
-  const [{ matches, hasError }, predictionsByMatchId] = await Promise.all([
+  const [
+    { matches, hasError },
+    { matches: finishedMatches, hasError: finishedHasError },
+    predictionsByMatchId,
+  ] = await Promise.all([
     getUpcomingMatches(),
+    getFinishedMatches(),
     getUserPredictionsByMatchId(),
   ]);
+
   const matchesByDay = groupMatchesByDay(matches);
+  const finishedMatchesByDay = groupMatchesByDay(finishedMatches, { order: "desc" });
   const showEmptyState = hasError || matches.length === 0;
+  const showFinishedEmptyState = finishedHasError || finishedMatches.length === 0;
 
   return (
     <>
@@ -85,6 +133,14 @@ export default async function Home() {
             hasError={hasError}
             matchesByDay={matchesByDay}
             showEmptyState={showEmptyState}
+            predictionsByMatchId={predictionsByMatchId}
+          />
+        }
+        finishedContent={
+          <FinishedMatchesContent
+            hasError={finishedHasError}
+            matchesByDay={finishedMatchesByDay}
+            showEmptyState={showFinishedEmptyState}
             predictionsByMatchId={predictionsByMatchId}
           />
         }
