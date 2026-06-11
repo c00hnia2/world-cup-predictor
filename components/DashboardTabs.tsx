@@ -2,20 +2,23 @@
 
 import { useState } from "react";
 
-type DashboardTab = "matches" | "predictions";
+type DashboardTab = "matches" | "finished" | "predictions";
 
 interface DashboardTabsProps {
   matchesContent: React.ReactNode;
+  finishedContent: React.ReactNode;
   predictionsContent: React.ReactNode;
 }
 
 const tabs: { id: DashboardTab; label: string }[] = [
   { id: "matches", label: "Wszystkie mecze" },
+  { id: "finished", label: "Zakończone Mecze" },
   { id: "predictions", label: "Moje typy" },
 ];
 
 export function DashboardTabs({
   matchesContent,
+  finishedContent,
   predictionsContent,
 }: DashboardTabsProps) {
   const [activeTab, setActiveTab] = useState<DashboardTab>("matches");
@@ -58,6 +61,15 @@ export function DashboardTabs({
         hidden={activeTab !== "matches"}
       >
         {matchesContent}
+      </div>
+
+      <div
+        role="tabpanel"
+        id="dashboard-panel-finished"
+        aria-labelledby="dashboard-tab-finished"
+        hidden={activeTab !== "finished"}
+      >
+        {finishedContent}
       </div>
 
       <div
