@@ -19,30 +19,22 @@ import { SITE_URL } from "@/lib/site";
 import type { AuthFormState } from "@/types/auth";
 import { createClient } from "@/utils/supabase/server";
 
-// Escapuje znaki specjalne wzorca ILIKE (_ i % to dzikie karty, \ to escape),
-// dzięki czemu np. "jan_kowalski" jest dopasowywane dosłownie, a nie jako wzorzec.
-function escapeLikePattern(value: string): string {
-  return value.replace(/[\\%_]/g, (char) => `\\${char}`);
-}
-
 async function isUsernameTaken(
   supabase: Awaited<ReturnType<typeof createClient>>,
   username: string,
 ): Promise<boolean> {
-  const { data, error } = await supabase
-    .from("public_profiles")
-    .select("id")
-    .ilike("username", escapeLikePattern(username))
-    .limit(1);
+  const { data, error } = await supabase.rpc("is_username_taken", {
+    p_username: username,
+  });
 
   if (error) {
     // Błąd odczytu nie powinien blokować rejestracji — unikalny indeks w bazie
-    // i tak ochroni przed duplikatem.
+    // i tak ochroni przed duplikatem przy potwierdzeniu emaila.
     console.error("[register] username check error:", error.message);
     return false;
   }
 
-  return (data?.length ?? 0) > 0;
+  return data === true;
 }
 
 function isUsernameTakenError(error: { message?: string }): boolean {
