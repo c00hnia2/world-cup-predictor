@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { assignCompetitionPositions } from "@/lib/competition-rank";
 import {
   getUserDisplayName,
   type LeaderboardEntry,
@@ -49,10 +50,15 @@ async function getLeaderboard(): Promise<{
     };
   }
 
+  const positions = assignCompetitionPositions(
+    profiles,
+    (profile) => profile.total_points ?? 0,
+  );
+
   const entries = profiles.map((profile, index) => ({
     ...profile,
     displayName: getUserDisplayName(profile),
-    position: index + 1,
+    position: positions[index],
   }));
 
   return {
