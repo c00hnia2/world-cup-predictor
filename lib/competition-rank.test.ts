@@ -6,7 +6,7 @@ describe("assignCompetitionPositions", () => {
     const items = [{ points: 10 }, { points: 8 }, { points: 5 }];
 
     expect(
-      assignCompetitionPositions(items, (item) => item.points),
+      assignCompetitionPositions(items, (item) => [item.points]),
     ).toEqual([1, 2, 3]);
   });
 
@@ -19,7 +19,7 @@ describe("assignCompetitionPositions", () => {
     ];
 
     expect(
-      assignCompetitionPositions(items, (item) => item.points),
+      assignCompetitionPositions(items, (item) => [item.points]),
     ).toEqual([1, 1, 1, 4]);
   });
 
@@ -34,11 +34,43 @@ describe("assignCompetitionPositions", () => {
     ];
 
     expect(
-      assignCompetitionPositions(items, (item) => item.points),
+      assignCompetitionPositions(items, (item) => [item.points]),
     ).toEqual([1, 2, 2, 4, 4, 6]);
   });
 
+  it("rozróżnia graczy z tą samą liczbą punktów po dokładnych wynikach", () => {
+    const items = [
+      { points: 10, exact: 2, outcomes: 5 },
+      { points: 10, exact: 1, outcomes: 6 },
+      { points: 10, exact: 1, outcomes: 4 },
+    ];
+
+    expect(
+      assignCompetitionPositions(items, (item) => [
+        item.points,
+        item.exact,
+        item.outcomes,
+      ]),
+    ).toEqual([1, 2, 3]);
+  });
+
+  it("nadaje ex aequo przy identycznych kryteriach rozstrzygających", () => {
+    const items = [
+      { points: 10, exact: 2, outcomes: 5 },
+      { points: 10, exact: 2, outcomes: 5 },
+      { points: 9, exact: 3, outcomes: 3 },
+    ];
+
+    expect(
+      assignCompetitionPositions(items, (item) => [
+        item.points,
+        item.exact,
+        item.outcomes,
+      ]),
+    ).toEqual([1, 1, 3]);
+  });
+
   it("zwraca pustą tablicę dla pustej listy", () => {
-    expect(assignCompetitionPositions([], () => 0)).toEqual([]);
+    expect(assignCompetitionPositions([], () => [0])).toEqual([]);
   });
 });

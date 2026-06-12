@@ -13,7 +13,9 @@ export async function fetchPublicProfilesByIds(
 
   const { data, error } = await supabase
     .from("public_profiles")
-    .select("id, username, total_points")
+    .select(
+      "id, username, total_points, exact_scores_count, correct_outcomes_count",
+    )
     .in("id", uniqueIds);
 
   if (error) {
