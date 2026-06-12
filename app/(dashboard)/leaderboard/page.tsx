@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
+import { RankingStatHeader } from "@/components/leaderboard/RankingStatHeader";
 import { assignCompetitionPositions } from "@/lib/competition-rank";
+import {
+  getRankingStatsFromProfile,
+  toRankingCriteria,
+} from "@/lib/ranking-stats";
 import {
   getUserDisplayName,
   type LeaderboardEntry,
@@ -26,8 +31,12 @@ async function getLeaderboard(): Promise<{
 
   const { data, error } = await supabase
     .from("public_profiles")
-    .select("id, username, total_points")
-    .order("total_points", { ascending: false });
+    .select(
+      "id, username, total_points, exact_scores_count, correct_outcomes_count",
+    )
+    .order("total_points", { ascending: false })
+    .order("exact_scores_count", { ascending: false })
+    .order("correct_outcomes_count", { ascending: false });
 
   if (error) {
     console.error("[leaderboard] fetch:", error.message);
@@ -50,9 +59,8 @@ async function getLeaderboard(): Promise<{
     };
   }
 
-  const positions = assignCompetitionPositions(
-    profiles,
-    (profile) => profile.total_points ?? 0,
+  const positions = assignCompetitionPositions(profiles, (profile) =>
+    toRankingCriteria(getRankingStatsFromProfile(profile)),
   );
 
   const entries = profiles.map((profile, index) => ({
@@ -102,12 +110,12 @@ export default async function LeaderboardPage() {
         </p>
       ) : (
         <div className="overflow-x-auto rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <table className="w-full min-w-[480px] text-left text-sm">
+          <table className="w-full min-w-[36rem] text-left text-sm">
             <thead>
               <tr className="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-800/50">
                 <th
                   scope="col"
-                  className="w-20 px-4 py-3 font-semibold text-zinc-700 dark:text-zinc-300"
+                  className="w-16 px-4 py-3 font-semibold text-zinc-700 dark:text-zinc-300 sm:w-20"
                 >
                   Lp.
                 </th>
@@ -117,6 +125,14 @@ export default async function LeaderboardPage() {
                 >
                   Nazwa gracza
                 </th>
+                <RankingStatHeader
+                  label="🎯"
+                  tooltip="Trafione dokładne wyniki"
+                />
+                <RankingStatHeader
+                  label="✔️"
+                  tooltip="Trafiony zwycięzca lub remis"
+                />
                 <th
                   scope="col"
                   className="px-4 py-3 text-right font-semibold text-zinc-700 dark:text-zinc-300"
@@ -148,6 +164,12 @@ export default async function LeaderboardPage() {
                           </span>
                         ) : null}
                       </span>
+                    </td>
+                    <td className="px-2 py-3 text-center tabular-nums sm:px-4">
+                      {entry.exact_scores_count ?? 0}
+                    </td>
+                    <td className="px-2 py-3 text-center tabular-nums sm:px-4">
+                      {entry.correct_outcomes_count ?? 0}
                     </td>
                     <td className="px-4 py-3 text-right tabular-nums">
                       {entry.total_points ?? 0}

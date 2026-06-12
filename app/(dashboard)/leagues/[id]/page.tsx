@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { RankingStatHeader } from "@/components/leaderboard/RankingStatHeader";
 import { CopyInviteCode } from "@/components/leagues/CopyInviteCode";
 import { buildLeagueRankEntries } from "@/lib/build-league-ranking";
 import { fetchPublicProfilesByIds } from "@/lib/fetch-public-profiles";
@@ -68,15 +69,10 @@ async function getLeagueDetail(
     (members ?? []).map((member) => member.user_id),
   );
 
-  const normalizedMembers = (members ?? [])
-    .map((member) => ({
-      joined_at: member.joined_at,
-      user: profiles.get(member.user_id) ?? null,
-    }))
-    .sort(
-      (left, right) =>
-        (right.user?.total_points ?? 0) - (left.user?.total_points ?? 0),
-    );
+  const normalizedMembers = (members ?? []).map((member) => ({
+    joined_at: member.joined_at,
+    user: profiles.get(member.user_id) ?? null,
+  }));
 
   return {
     status: "ok",
@@ -199,12 +195,12 @@ export default async function LeagueDetailPage({ params }: LeagueDetailPageProps
           </p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[480px] text-left text-sm">
+            <table className="w-full min-w-[36rem] text-left text-sm">
               <thead>
                 <tr className="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-800/50">
                   <th
                     scope="col"
-                    className="w-20 px-4 py-3 font-semibold text-zinc-700 dark:text-zinc-300 sm:px-8"
+                    className="w-16 px-4 py-3 font-semibold text-zinc-700 dark:text-zinc-300 sm:w-20 sm:px-8"
                   >
                     Lp.
                   </th>
@@ -214,6 +210,16 @@ export default async function LeagueDetailPage({ params }: LeagueDetailPageProps
                   >
                     Nazwa gracza
                   </th>
+                  <RankingStatHeader
+                    label="🎯"
+                    tooltip="Trafione dokładne wyniki"
+                    className="w-16 px-2 py-3 text-center font-semibold text-zinc-700 dark:text-zinc-300 sm:w-20 sm:px-4"
+                  />
+                  <RankingStatHeader
+                    label="✔️"
+                    tooltip="Trafiony zwycięzca lub remis"
+                    className="w-16 px-2 py-3 text-center font-semibold text-zinc-700 dark:text-zinc-300 sm:w-20 sm:px-4"
+                  />
                   <th
                     scope="col"
                     className="px-4 py-3 text-right font-semibold text-zinc-700 dark:text-zinc-300 sm:px-8"
@@ -247,6 +253,12 @@ export default async function LeagueDetailPage({ params }: LeagueDetailPageProps
                             </span>
                           ) : null}
                         </span>
+                      </td>
+                      <td className="px-2 py-3 text-center tabular-nums sm:px-4">
+                        {entry.exactScoresCount}
+                      </td>
+                      <td className="px-2 py-3 text-center tabular-nums sm:px-4">
+                        {entry.correctOutcomesCount}
                       </td>
                       <td className="px-4 py-3 text-right tabular-nums sm:px-8">
                         {entry.totalPoints}
