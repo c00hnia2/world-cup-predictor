@@ -1,5 +1,21 @@
 import type { PublicProfile } from "@/types/user";
 
+/** Rozłączne zliczanie statystyk rankingu (zgodne z recalculate_user_total_points). */
+export function getPredictionRankingBuckets(pointsEarned: number): {
+  exactScore: boolean;
+  correctOutcome: boolean;
+} {
+  if (pointsEarned === 3) {
+    return { exactScore: true, correctOutcome: false };
+  }
+
+  if (pointsEarned === 1) {
+    return { exactScore: false, correctOutcome: true };
+  }
+
+  return { exactScore: false, correctOutcome: false };
+}
+
 export interface RankingStats {
   totalPoints: number;
   exactScoresCount: number;
