@@ -24,6 +24,8 @@ export interface LeagueRankEntry {
   userId: string;
   displayName: string;
   totalPoints: number;
+  exactScoresCount: number;
+  correctOutcomesCount: number;
   joinedAt: string;
 }
 

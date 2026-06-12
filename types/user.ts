@@ -2,6 +2,8 @@ export interface PublicProfile {
   id: string;
   username: string | null;
   total_points: number | null;
+  exact_scores_count: number | null;
+  correct_outcomes_count: number | null;
 }
 
 export interface UserProfile extends PublicProfile {
