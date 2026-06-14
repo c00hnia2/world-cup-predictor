@@ -1,4 +1,8 @@
 import { fetchPublicProfilesByIds } from "@/lib/fetch-public-profiles";
+import {
+  compareRankingStats,
+  getRankingStatsFromProfile,
+} from "@/lib/ranking-stats";
 import { getUserDisplayName } from "@/types/user";
 import { createClient } from "@/utils/supabase/server";
 
@@ -70,11 +74,15 @@ export async function getMatchPredictions(
     };
   });
 
-  // Bieżący użytkownik na górze, reszta wg nazwy.
+  // Bieżący użytkownik na górze; reszta wg ogólnego rankingu (punkty, tie-breakery).
   predictions.sort((left, right) => {
     if (left.isCurrentUser) return -1;
     if (right.isCurrentUser) return 1;
-    return left.displayName.localeCompare(right.displayName, "pl");
+
+    return compareRankingStats(
+      getRankingStatsFromProfile(profiles.get(left.userId)),
+      getRankingStatsFromProfile(profiles.get(right.userId)),
+    );
   });
 
   return { status: "ok", predictions };
