@@ -109,7 +109,7 @@ export default async function LeaderboardPage() {
           Brak graczy w rankingu.
         </p>
       ) : (
-        <div className="rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="min-w-0 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
           <RankingTable
             rows={entries.map((entry) => ({
               key: entry.id,

@@ -171,7 +171,7 @@ export default async function LeagueDetailPage({ params }: LeagueDetailPageProps
 
       <section
         aria-labelledby="ranking-heading"
-        className="rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+        className="min-w-0 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
       >
         <div className="border-b border-zinc-200 px-6 py-4 dark:border-zinc-800 sm:px-8">
           <h2

@@ -12,16 +12,14 @@ export interface RankingTableRow {
 
 interface RankingTableProps {
   rows: RankingTableRow[];
-  /** Column header for points from 400px upward (narrow mobile always shows "Pkt"). */
+  /** Pełna etykieta kolumny punktów na desktopie (na mobile zawsze „Pkt”). */
   pointsLabel?: string;
-  /** Extra horizontal padding on sm+ (league ranking). */
+  /** Extra horizontal padding on md+ (league ranking). */
   widePadding?: boolean;
 }
 
-const statColumnClass =
-  "hidden min-[400px]:table-cell w-10 px-1 py-3 text-center tabular-nums min-[400px]:px-2 md:w-16 md:px-4";
 const statHeaderClass =
-  "hidden min-[400px]:table-cell w-10 px-1 py-3 text-center font-semibold text-zinc-700 dark:text-zinc-300 min-[400px]:px-2 md:w-16 md:px-4";
+  "px-0 py-2 text-center text-[11px] font-semibold leading-none text-zinc-700 md:px-4 md:py-3 md:text-sm dark:text-zinc-300";
 
 export function RankingTable({
   rows,
@@ -31,21 +29,29 @@ export function RankingTable({
   const edgePadding = widePadding ? "md:px-8" : "";
 
   return (
-    <div className="overflow-x-auto md:overflow-x-visible">
-      <table className="w-full table-fixed text-left text-sm md:min-w-[36rem] md:table-auto">
+    <div className="min-w-0 max-w-full overflow-hidden">
+      <table className="w-full max-w-full table-fixed border-collapse text-xs md:min-w-[36rem] md:table-auto md:text-sm">
+        <colgroup className="md:hidden">
+          <col className="w-[9%]" />
+          <col className="w-[37%]" />
+          <col className="w-[14%]" />
+          <col className="w-[14%]" />
+          <col className="w-[14%]" />
+        </colgroup>
         <thead>
           <tr className="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-800/50">
             <th
               scope="col"
-              className={`w-10 px-2 py-3 font-semibold text-zinc-700 dark:text-zinc-300 md:w-16 md:px-4 ${edgePadding}`}
+              className={`px-1 py-2 text-left font-semibold text-zinc-700 md:w-16 md:px-4 md:py-3 ${edgePadding}`}
             >
               Lp.
             </th>
             <th
               scope="col"
-              className="px-2 py-3 font-semibold text-zinc-700 dark:text-zinc-300 md:px-4"
+              className="overflow-hidden px-1 py-2 text-left font-semibold text-zinc-700 md:px-4 md:py-3"
             >
-              Nazwa gracza
+              <span className="md:hidden">Gracz</span>
+              <span className="hidden md:inline">Nazwa gracza</span>
             </th>
             <RankingStatHeader
               label="🎯"
@@ -59,10 +65,10 @@ export function RankingTable({
             />
             <th
               scope="col"
-              className={`w-14 px-2 py-3 text-right font-semibold text-zinc-700 dark:text-zinc-300 md:w-auto md:px-4 ${edgePadding}`}
+              className={`px-1 py-2 text-right font-semibold text-zinc-700 md:px-4 md:py-3 ${edgePadding}`}
             >
-              <span className="min-[400px]:hidden">Pkt</span>
-              <span className="hidden min-[400px]:inline">{pointsLabel}</span>
+              <span className="md:hidden">Pkt</span>
+              <span className="hidden md:inline">{pointsLabel}</span>
             </th>
           </tr>
         </thead>
@@ -76,23 +82,34 @@ export function RankingTable({
                   : "text-zinc-900 dark:text-zinc-100"
               }`}
             >
-              <td className={`px-2 py-3 tabular-nums md:px-4 ${edgePadding}`}>
+              <td
+                className={`overflow-hidden px-1 py-2 tabular-nums md:px-4 md:py-3 ${edgePadding}`}
+              >
                 {row.position}
               </td>
-              <td className="px-2 py-3 md:px-4">
-                <span className="inline-flex min-w-0 items-center gap-2">
-                  <span className="truncate">{row.displayName}</span>
+              <td className="overflow-hidden px-1 py-2 md:px-4 md:py-3">
+                <div className="flex min-w-0 items-center gap-1 md:gap-2">
+                  <span
+                    className="min-w-0 flex-1 truncate"
+                    title={row.displayName}
+                  >
+                    {row.displayName}
+                  </span>
                   {row.isCurrentUser ? (
-                    <span className="shrink-0 rounded-full bg-emerald-600 px-2 py-0.5 text-xs font-semibold text-white dark:bg-emerald-500">
+                    <span className="shrink-0 rounded-full bg-emerald-600 px-1 py-px text-[9px] font-semibold leading-tight text-white md:px-2 md:py-0.5 md:text-xs dark:bg-emerald-500">
                       Ty
                     </span>
                   ) : null}
-                </span>
+                </div>
               </td>
-              <td className={statColumnClass}>{row.exactScoresCount}</td>
-              <td className={statColumnClass}>{row.correctOutcomesCount}</td>
+              <td className="overflow-hidden px-0 py-2 text-center tabular-nums md:px-4 md:py-3">
+                {row.exactScoresCount}
+              </td>
+              <td className="overflow-hidden px-0 py-2 text-center tabular-nums md:px-4 md:py-3">
+                {row.correctOutcomesCount}
+              </td>
               <td
-                className={`px-2 py-3 text-right tabular-nums max-[399px]:font-bold md:px-4 ${edgePadding}`}
+                className={`overflow-hidden px-1 py-2 text-right tabular-nums font-bold md:px-4 md:py-3 md:font-normal ${edgePadding}`}
               >
                 {row.totalPoints}
               </td>
