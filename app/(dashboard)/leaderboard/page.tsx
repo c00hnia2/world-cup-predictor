@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { RankingStatHeader } from "@/components/leaderboard/RankingStatHeader";
+import { RankingTable } from "@/components/leaderboard/RankingTable";
 import { assignCompetitionPositions } from "@/lib/competition-rank";
 import {
   getRankingStatsFromProfile,
@@ -109,76 +109,18 @@ export default async function LeaderboardPage() {
           Brak graczy w rankingu.
         </p>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <table className="w-full min-w-[36rem] text-left text-sm">
-            <thead>
-              <tr className="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-800/50">
-                <th
-                  scope="col"
-                  className="w-16 px-4 py-3 font-semibold text-zinc-700 dark:text-zinc-300 sm:w-20"
-                >
-                  Lp.
-                </th>
-                <th
-                  scope="col"
-                  className="px-4 py-3 font-semibold text-zinc-700 dark:text-zinc-300"
-                >
-                  Nazwa gracza
-                </th>
-                <RankingStatHeader
-                  label="🎯"
-                  tooltip="Trafione dokładne wyniki"
-                />
-                <RankingStatHeader
-                  label="✔️"
-                  tooltip="Trafiony zwycięzca lub remis"
-                />
-                <th
-                  scope="col"
-                  className="px-4 py-3 text-right font-semibold text-zinc-700 dark:text-zinc-300"
-                >
-                  Punkty
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {entries.map((entry) => {
-                const isCurrentUser = entry.id === currentUserId;
-
-                return (
-                  <tr
-                    key={entry.id}
-                    className={`border-b border-zinc-100 last:border-0 dark:border-zinc-800 ${
-                      isCurrentUser
-                        ? "bg-emerald-50 font-semibold text-emerald-950 dark:bg-emerald-950/30 dark:text-emerald-50"
-                        : "text-zinc-900 dark:text-zinc-100"
-                    }`}
-                  >
-                    <td className="px-4 py-3 tabular-nums">{entry.position}</td>
-                    <td className="px-4 py-3">
-                      <span className="inline-flex items-center gap-2">
-                        {entry.displayName}
-                        {isCurrentUser ? (
-                          <span className="rounded-full bg-emerald-600 px-2 py-0.5 text-xs font-semibold text-white dark:bg-emerald-500">
-                            Ty
-                          </span>
-                        ) : null}
-                      </span>
-                    </td>
-                    <td className="px-2 py-3 text-center tabular-nums sm:px-4">
-                      {entry.exact_scores_count ?? 0}
-                    </td>
-                    <td className="px-2 py-3 text-center tabular-nums sm:px-4">
-                      {entry.correct_outcomes_count ?? 0}
-                    </td>
-                    <td className="px-4 py-3 text-right tabular-nums">
-                      {entry.total_points ?? 0}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+        <div className="rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+          <RankingTable
+            rows={entries.map((entry) => ({
+              key: entry.id,
+              position: entry.position,
+              displayName: entry.displayName,
+              exactScoresCount: entry.exact_scores_count ?? 0,
+              correctOutcomesCount: entry.correct_outcomes_count ?? 0,
+              totalPoints: entry.total_points ?? 0,
+              isCurrentUser: entry.id === currentUserId,
+            }))}
+          />
         </div>
       )}
     </>
