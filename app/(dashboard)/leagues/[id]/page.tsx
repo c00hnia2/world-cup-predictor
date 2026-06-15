@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { RankingStatHeader } from "@/components/leaderboard/RankingStatHeader";
+import { RankingTable } from "@/components/leaderboard/RankingTable";
 import { CopyInviteCode } from "@/components/leagues/CopyInviteCode";
 import { buildLeagueRankEntries } from "@/lib/build-league-ranking";
 import { fetchPublicProfilesByIds } from "@/lib/fetch-public-profiles";
@@ -194,81 +194,19 @@ export default async function LeagueDetailPage({ params }: LeagueDetailPageProps
             Brak członków w tej lidze.
           </p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[36rem] text-left text-sm">
-              <thead>
-                <tr className="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-800/50">
-                  <th
-                    scope="col"
-                    className="w-16 px-4 py-3 font-semibold text-zinc-700 dark:text-zinc-300 sm:w-20 sm:px-8"
-                  >
-                    Lp.
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-4 py-3 font-semibold text-zinc-700 dark:text-zinc-300"
-                  >
-                    Nazwa gracza
-                  </th>
-                  <RankingStatHeader
-                    label="🎯"
-                    tooltip="Trafione dokładne wyniki"
-                    className="w-16 px-2 py-3 text-center font-semibold text-zinc-700 dark:text-zinc-300 sm:w-20 sm:px-4"
-                  />
-                  <RankingStatHeader
-                    label="✔️"
-                    tooltip="Trafiony zwycięzca lub remis"
-                    className="w-16 px-2 py-3 text-center font-semibold text-zinc-700 dark:text-zinc-300 sm:w-20 sm:px-4"
-                  />
-                  <th
-                    scope="col"
-                    className="px-4 py-3 text-right font-semibold text-zinc-700 dark:text-zinc-300 sm:px-8"
-                  >
-                    Suma punktów
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {ranking.map((entry) => {
-                  const isCurrentUser = entry.userId === user.id;
-
-                  return (
-                    <tr
-                      key={entry.userId || `${entry.joinedAt}-${entry.position}`}
-                      className={`border-b border-zinc-100 last:border-0 dark:border-zinc-800 ${
-                        isCurrentUser
-                          ? "bg-emerald-50 font-semibold text-emerald-950 dark:bg-emerald-950/30 dark:text-emerald-50"
-                          : "text-zinc-900 dark:text-zinc-100"
-                      }`}
-                    >
-                      <td className="px-4 py-3 tabular-nums sm:px-8">
-                        {entry.position}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="inline-flex items-center gap-2">
-                          {entry.displayName}
-                          {isCurrentUser ? (
-                            <span className="rounded-full bg-emerald-600 px-2 py-0.5 text-xs font-semibold text-white dark:bg-emerald-500">
-                              Ty
-                            </span>
-                          ) : null}
-                        </span>
-                      </td>
-                      <td className="px-2 py-3 text-center tabular-nums sm:px-4">
-                        {entry.exactScoresCount}
-                      </td>
-                      <td className="px-2 py-3 text-center tabular-nums sm:px-4">
-                        {entry.correctOutcomesCount}
-                      </td>
-                      <td className="px-4 py-3 text-right tabular-nums sm:px-8">
-                        {entry.totalPoints}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          <RankingTable
+            widePadding
+            pointsLabel="Suma punktów"
+            rows={ranking.map((entry) => ({
+              key: entry.userId || `${entry.joinedAt}-${entry.position}`,
+              position: entry.position,
+              displayName: entry.displayName,
+              exactScoresCount: entry.exactScoresCount,
+              correctOutcomesCount: entry.correctOutcomesCount,
+              totalPoints: entry.totalPoints,
+              isCurrentUser: entry.userId === user.id,
+            }))}
+          />
         )}
       </section>
     </>
