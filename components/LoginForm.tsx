@@ -12,7 +12,11 @@ import {
 } from "@/components/auth/AuthFormStyles";
 import { initialAuthFormState } from "@/types/auth";
 
-export function LoginForm() {
+interface LoginFormProps {
+  successMessage?: string | null;
+}
+
+export function LoginForm({ successMessage }: LoginFormProps) {
   const [state, formAction] = useActionState(login, initialAuthFormState);
 
   return (
@@ -23,6 +27,15 @@ export function LoginForm() {
           className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300"
         >
           {state.message}
+        </div>
+      ) : null}
+
+      {successMessage ? (
+        <div
+          role="status"
+          className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-300"
+        >
+          {successMessage}
         </div>
       ) : null}
 
@@ -81,6 +94,14 @@ export function LoginForm() {
             {state.fieldErrors.password}
           </p>
         ) : null}
+        <p className="text-right">
+          <Link
+            href="/forgot-password"
+            className="text-xs font-medium text-emerald-600 underline-offset-4 hover:underline dark:text-emerald-400"
+          >
+            Zapomniałeś hasła?
+          </Link>
+        </p>
       </div>
 
       <AuthSubmitButton idleLabel="Zaloguj się" pendingLabel="Logowanie…" />
