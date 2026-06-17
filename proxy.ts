@@ -10,7 +10,7 @@ import {
 // wymienione. Wcześniejszy "/dashboard" był martwym prefiksem (grupa routingu
 // (dashboard) mapuje się na "/", nie na "/dashboard").
 const PROTECTED_PREFIXES = ["/admin", "/leagues"] as const;
-const AUTH_ROUTE_PREFIXES = ["/login", "/register"] as const;
+const AUTH_ROUTE_PREFIXES = ["/login", "/register", "/forgot-password"] as const;
 
 function matchesRoutePrefix(
   pathname: string,
