@@ -9,7 +9,7 @@ import {
 // indeksowalny — patrz app/sitemap.ts i app/robots.ts), dlatego nie jest tu
 // wymienione. Wcześniejszy "/dashboard" był martwym prefiksem (grupa routingu
 // (dashboard) mapuje się na "/", nie na "/dashboard").
-const PROTECTED_PREFIXES = ["/admin", "/leagues"] as const;
+const PROTECTED_PREFIXES = ["/admin", "/leagues", "/profile"] as const;
 const AUTH_ROUTE_PREFIXES = ["/login", "/register", "/forgot-password"] as const;
 
 function matchesRoutePrefix(

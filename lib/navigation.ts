@@ -1,7 +1,7 @@
 export interface NavItem {
   href: string;
   label: string;
-  icon: "matches" | "leaderboard" | "leagues" | "admin";
+  icon: "matches" | "leaderboard" | "leagues" | "profile" | "admin";
   adminOnly?: boolean;
 }
 
@@ -9,6 +9,7 @@ export const mainNavItems: NavItem[] = [
   { href: "/", label: "Mecze", icon: "matches" },
   { href: "/leaderboard", label: "Ranking", icon: "leaderboard" },
   { href: "/leagues", label: "Ligi", icon: "leagues" },
+  { href: "/profile", label: "Profil", icon: "profile" },
   { href: "/admin", label: "Admin", icon: "admin", adminOnly: true },
 ];
 

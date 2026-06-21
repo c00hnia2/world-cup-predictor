@@ -46,6 +46,18 @@ export function NavIcon({ icon, className = "h-5 w-5" }: NavIconProps) {
           />
         </svg>
       );
+    case "profile":
+      return (
+        <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.75" />
+          <path
+            d="M5 20a7 7 0 0 1 14 0"
+            stroke="currentColor"
+            strokeWidth="1.75"
+            strokeLinecap="round"
+          />
+        </svg>
+      );
     case "admin":
       return (
         <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">
