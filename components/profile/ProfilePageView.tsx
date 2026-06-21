@@ -1,4 +1,5 @@
 import { ProfileAccuracyPieCharts } from "@/components/profile/ProfileAccuracyPieCharts";
+import { ProfilePageProvider } from "@/components/profile/ProfilePageProvider";
 import { ProfileStatsSummary } from "@/components/profile/ProfileStatsSummary";
 import { ProfileTimelineCharts } from "@/components/profile/ProfileTimelineCharts";
 import type { ProfilePageData } from "@/lib/get-profile-data";
@@ -11,7 +12,10 @@ export function ProfilePageView({ profileData }: ProfilePageViewProps) {
   const { isOwnProfile } = profileData;
 
   return (
-    <>
+    <ProfilePageProvider
+      username={profileData.profileUsername}
+      displayName={profileData.displayName}
+    >
       <header className="mb-10">
         <p className="text-sm font-medium uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
           {isOwnProfile ? "Twoje statystyki" : "Statystyki gracza"}
@@ -39,7 +43,6 @@ export function ProfilePageView({ profileData }: ProfilePageViewProps) {
       <div className="space-y-8">
         <ProfileStatsSummary
           displayName={profileData.displayName}
-          profileUsername={profileData.profileUsername}
           globalRank={profileData.globalRank}
           totalPoints={profileData.totalPoints}
           exactScoresCount={profileData.exactScoresCount}
@@ -60,6 +63,6 @@ export function ProfilePageView({ profileData }: ProfilePageViewProps) {
           usingMockTimeline={profileData.chartData.usingMockTimeline}
         />
       </div>
-    </>
+    </ProfilePageProvider>
   );
 }
