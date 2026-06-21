@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { fetchMatchPredictions } from "@/app/actions";
+import { PlayerNameLink } from "@/components/PlayerNameLink";
 import type { MatchPredictionEntry } from "@/lib/get-match-predictions";
 
 interface OtherPredictionsProps {
@@ -45,9 +46,11 @@ function PredictionRow({
   return (
     <li className="flex items-center justify-between gap-3 rounded-xl bg-zinc-50 px-3 py-2 dark:bg-zinc-800/60">
       <span className="flex min-w-0 items-center gap-2">
-        <span className="truncate text-sm font-medium text-zinc-800 dark:text-zinc-100">
-          {entry.displayName}
-        </span>
+        <PlayerNameLink
+          username={entry.username}
+          displayName={entry.displayName}
+          className="truncate text-sm font-medium text-zinc-800 dark:text-zinc-100"
+        />
         {entry.isCurrentUser ? (
           <span className="shrink-0 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
             Ty

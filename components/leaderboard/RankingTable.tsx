@@ -1,9 +1,11 @@
 import { RankingStatHeader } from "@/components/leaderboard/RankingStatHeader";
+import { PlayerNameLink } from "@/components/PlayerNameLink";
 
 export interface RankingTableRow {
   key: string;
   position: number;
   displayName: string;
+  username?: string | null;
   exactScoresCount: number;
   correctOutcomesCount: number;
   totalPoints: number;
@@ -89,12 +91,11 @@ export function RankingTable({
               </td>
               <td className="overflow-hidden px-1 py-2 md:px-4 md:py-3">
                 <div className="flex min-w-0 items-center gap-1 md:gap-2">
-                  <span
-                    className="min-w-0 flex-1 truncate"
-                    title={row.displayName}
-                  >
-                    {row.displayName}
-                  </span>
+                  <PlayerNameLink
+                    username={row.username}
+                    displayName={row.displayName}
+                    className="min-w-0 flex-1 truncate font-inherit text-inherit hover:text-emerald-600 dark:hover:text-emerald-400"
+                  />
                   {row.isCurrentUser ? (
                     <span className="shrink-0 rounded-full bg-emerald-600 px-1 py-px text-[9px] font-semibold leading-tight text-white md:px-2 md:py-0.5 md:text-xs dark:bg-emerald-500">
                       Ty

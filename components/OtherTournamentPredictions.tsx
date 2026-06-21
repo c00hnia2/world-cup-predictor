@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { fetchTournamentPredictions } from "@/app/actions/tournament";
+import { PlayerNameLink } from "@/components/PlayerNameLink";
 import type { TournamentPredictionEntry } from "@/lib/get-tournament-predictions";
 
 type LoadState =
@@ -29,9 +30,11 @@ function TournamentPredictionRow({ entry }: { entry: TournamentPredictionEntry }
   return (
     <li className="flex flex-col gap-1 rounded-xl bg-zinc-50 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between dark:bg-zinc-800/60">
       <span className="flex min-w-0 items-center gap-2">
-        <span className="truncate text-sm font-medium text-zinc-800 dark:text-zinc-100">
-          {entry.displayName}
-        </span>
+        <PlayerNameLink
+          username={entry.username}
+          displayName={entry.displayName}
+          className="truncate text-sm font-medium text-zinc-800 dark:text-zinc-100"
+        />
         {entry.isCurrentUser ? (
           <span className="shrink-0 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
             Ty
