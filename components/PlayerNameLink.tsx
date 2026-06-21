@@ -1,10 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useProfilePageContext } from "@/components/profile/ProfilePageProvider";
 import {
   getPlayerProfilePath,
+  isSameProfilePath,
   playerNameLinkClassName,
+  toStaticPlayerNameClassName,
 } from "@/lib/player-profile-path";
 
 interface PlayerNameLinkProps {
@@ -28,8 +31,23 @@ export function PlayerNameLink({
   onClick,
 }: PlayerNameLinkProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const profilePage = useProfilePageContext();
   const href = getPlayerProfilePath(username, displayName);
   const combinedClassName = `${playerNameLinkClassName} ${className}`.trim();
+  const isCurrentProfile = isSameProfilePath(pathname, href, profilePage ?? undefined);
+
+  if (isCurrentProfile) {
+    return (
+      <span
+        title={title ?? displayName}
+        className={toStaticPlayerNameClassName(className)}
+        style={style}
+      >
+        {displayName}
+      </span>
+    );
+  }
 
   if (asSpan) {
     return (
