@@ -11,6 +11,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { PlayerNameLink } from "@/components/PlayerNameLink";
 import { ProfilePlayerComparisonSelector } from "@/components/profile/ProfilePlayerComparisonSelector";
 import {
   buildComparisonChartRows,
@@ -82,9 +83,12 @@ function ComparisonLineTooltip({
               className="flex items-center justify-between gap-4 tabular-nums"
               style={{ color: entry.color }}
             >
-              <span className="font-medium">
-                {player?.displayName ?? entry.dataKey}
-              </span>
+              <PlayerNameLink
+                username={player?.username}
+                displayName={player?.displayName ?? entry.dataKey}
+                className="font-medium"
+                style={{ color: entry.color }}
+              />
               <span>
                 {valueLabel}: {entry.value}
               </span>
@@ -93,6 +97,44 @@ function ComparisonLineTooltip({
         })}
       </ul>
     </div>
+  );
+}
+
+function ComparisonLegendContent({
+  payload,
+  playersById,
+}: {
+  payload?: ReadonlyArray<{ value?: string; color?: string }>;
+  playersById: Record<string, ComparisonPlayer>;
+}) {
+  if (!payload?.length) {
+    return null;
+  }
+
+  return (
+    <ul className="flex flex-wrap justify-center gap-x-4 gap-y-1 pt-2 text-xs text-zinc-700 dark:text-zinc-300">
+      {payload.map((entry) => {
+        if (!entry.value) {
+          return null;
+        }
+
+        const player = playersById[entry.value];
+
+        return (
+          <li key={entry.value} className="flex items-center gap-1.5">
+            <span
+              className="inline-block h-2 w-2 shrink-0 rounded-full"
+              style={{ backgroundColor: entry.color }}
+            />
+            <PlayerNameLink
+              username={player?.username}
+              displayName={player?.displayName ?? entry.value}
+              className="text-xs"
+            />
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 
@@ -159,9 +201,12 @@ function TimelineCard({
               }
             />
             <Legend
-              formatter={(value) =>
-                playersById[value]?.displayName ?? String(value)
-              }
+              content={(props) => (
+                <ComparisonLegendContent
+                  payload={props.payload}
+                  playersById={playersById}
+                />
+              )}
             />
             {visiblePlayers.map((player) => (
               <Line

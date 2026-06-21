@@ -1,10 +1,14 @@
+import { PlayerNameLink } from "@/components/PlayerNameLink";
+
 interface ProfileStatsSummaryProps {
   displayName: string;
+  profileUsername?: string | null;
   globalRank: number | null;
   totalPoints: number;
   exactScoresCount: number;
   correctOutcomesCount: number;
   finishedPredictions: number;
+  isOwnProfile?: boolean;
 }
 
 function StatCard({
@@ -33,21 +37,27 @@ function StatCard({
 
 export function ProfileStatsSummary({
   displayName,
+  profileUsername,
   globalRank,
   totalPoints,
   exactScoresCount,
   correctOutcomesCount,
   finishedPredictions,
+  isOwnProfile = true,
 }: ProfileStatsSummaryProps) {
   return (
     <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-8">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-            Zalogowany gracz
+            {isOwnProfile ? "Zalogowany gracz" : "Profil gracza"}
           </p>
           <h2 className="mt-1 text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-            {displayName}
+            <PlayerNameLink
+              username={profileUsername}
+              displayName={displayName}
+              className="text-zinc-900 hover:text-emerald-600 dark:text-zinc-50 dark:hover:text-emerald-400"
+            />
           </h2>
         </div>
         <p className="text-sm text-zinc-600 dark:text-zinc-400">

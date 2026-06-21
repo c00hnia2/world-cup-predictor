@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { PlayerNameLink } from "@/components/PlayerNameLink";
 import {
   areAllComparisonPlayersSelected,
   buildPlayerColorMap,
@@ -117,7 +118,11 @@ export function ProfilePlayerComparisonSelector({
             className="h-2.5 w-2.5 rounded-full"
             style={{ backgroundColor: colorMap[currentUser.id] }}
           />
-          {currentUser.displayName}
+          <PlayerNameLink
+            username={currentUser.username}
+            displayName={currentUser.displayName}
+            className="font-medium text-emerald-700 dark:text-emerald-300"
+          />
           <span className="text-xs text-emerald-600 dark:text-emerald-400">
             (Ty)
           </span>
@@ -157,7 +162,12 @@ export function ProfilePlayerComparisonSelector({
                 className="h-2.5 w-2.5 rounded-full"
                 style={{ backgroundColor: colorMap[player.id] }}
               />
-              {player.displayName}
+              <PlayerNameLink
+                username={player.username}
+                displayName={player.displayName}
+                asSpan
+                onClick={(event) => event.stopPropagation()}
+              />
             </button>
           );
         })}
