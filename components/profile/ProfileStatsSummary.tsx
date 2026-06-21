@@ -1,8 +1,5 @@
-import { PlayerNameLink } from "@/components/PlayerNameLink";
-
 interface ProfileStatsSummaryProps {
   displayName: string;
-  profileUsername?: string | null;
   globalRank: number | null;
   totalPoints: number;
   exactScoresCount: number;
@@ -37,7 +34,6 @@ function StatCard({
 
 export function ProfileStatsSummary({
   displayName,
-  profileUsername,
   globalRank,
   totalPoints,
   exactScoresCount,
@@ -53,11 +49,7 @@ export function ProfileStatsSummary({
             {isOwnProfile ? "Zalogowany gracz" : "Profil gracza"}
           </p>
           <h2 className="mt-1 text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-            <PlayerNameLink
-              username={profileUsername}
-              displayName={displayName}
-              className="text-zinc-900 hover:text-emerald-600 dark:text-zinc-50 dark:hover:text-emerald-400"
-            />
+            {displayName}
           </h2>
         </div>
         <p className="text-sm text-zinc-600 dark:text-zinc-400">
