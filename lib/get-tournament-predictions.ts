@@ -6,6 +6,7 @@ import { createClient } from "@/utils/supabase/server";
 export interface TournamentPredictionEntry {
   userId: string;
   displayName: string;
+  username: string | null;
   winnerName: string;
   topScorerName: string;
   pointsEarned: number | null;
@@ -74,6 +75,7 @@ export async function getAllTournamentPredictions(): Promise<AllTournamentPredic
       displayName: getUserDisplayName({
         username: profile?.username ?? null,
       }),
+      username: profile?.username ?? null,
         winnerName: normalized.predicted_winner?.name ?? "—",
         topScorerName: normalized.predicted_top_scorer?.name ?? "—",
         pointsEarned: row.points_earned,

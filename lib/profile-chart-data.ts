@@ -17,6 +17,7 @@ export interface TimelinePoint {
 export interface ComparisonPlayer {
   id: string;
   displayName: string;
+  username?: string | null;
   isCurrentUser: boolean;
 }
 
@@ -386,12 +387,12 @@ export function buildProfileChartData(
 }
 
 export const PROFILE_MOCK_COMPARE_PLAYERS: ComparisonPlayer[] = [
-  { id: "mock-player-1", displayName: "AniaK", isCurrentUser: false },
-  { id: "mock-player-2", displayName: "MarekTyper", isCurrentUser: false },
-  { id: "mock-player-3", displayName: "FutbolFan99", isCurrentUser: false },
-  { id: "mock-player-4", displayName: "KubaPro", isCurrentUser: false },
-  { id: "mock-player-5", displayName: "ZosiaGol", isCurrentUser: false },
-  { id: "mock-player-6", displayName: "PiotrMS", isCurrentUser: false },
+  { id: "mock-player-1", displayName: "AniaK", username: "AniaK", isCurrentUser: false },
+  { id: "mock-player-2", displayName: "MarekTyper", username: "MarekTyper", isCurrentUser: false },
+  { id: "mock-player-3", displayName: "FutbolFan99", username: "FutbolFan99", isCurrentUser: false },
+  { id: "mock-player-4", displayName: "KubaPro", username: "KubaPro", isCurrentUser: false },
+  { id: "mock-player-5", displayName: "ZosiaGol", username: "ZosiaGol", isCurrentUser: false },
+  { id: "mock-player-6", displayName: "PiotrMS", username: "PiotrMS", isCurrentUser: false },
 ];
 
 export const PROFILE_MOCK_POINTS_TIMELINE: ComparisonTimelinePoint[] = [

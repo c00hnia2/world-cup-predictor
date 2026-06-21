@@ -9,6 +9,7 @@ import { createClient } from "@/utils/supabase/server";
 export interface MatchPredictionEntry {
   userId: string;
   displayName: string;
+  username: string | null;
   predictedScoreA: number;
   predictedScoreB: number;
   pointsEarned: number | null;
@@ -67,6 +68,7 @@ export async function getMatchPredictions(
       displayName: getUserDisplayName({
         username: profile?.username ?? null,
       }),
+      username: profile?.username ?? null,
       predictedScoreA: row.predicted_score_a,
       predictedScoreB: row.predicted_score_b,
       pointsEarned: row.points_earned,

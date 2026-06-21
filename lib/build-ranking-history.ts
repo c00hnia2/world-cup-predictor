@@ -204,6 +204,7 @@ export async function buildTimelineComparisonData(
   const currentUser: ComparisonPlayer = {
     id: currentUserId,
     displayName: getUserDisplayName(currentProfile),
+    username: currentProfile.username,
     isCurrentUser: true,
   };
 
@@ -212,6 +213,7 @@ export async function buildTimelineComparisonData(
     .map((profile) => ({
       id: profile.id,
       displayName: getUserDisplayName(profile),
+      username: profile.username,
       isCurrentUser: false,
     }))
     .sort((left, right) => left.displayName.localeCompare(right.displayName, "pl"));

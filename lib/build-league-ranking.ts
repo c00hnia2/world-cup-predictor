@@ -30,6 +30,7 @@ export function buildLeagueRankEntries(
       displayName: member.user
         ? getUserDisplayName(member.user)
         : "Nieznany gracz",
+      username: member.user?.username ?? null,
       totalPoints: stats.totalPoints,
       exactScoresCount: stats.exactScoresCount,
       correctOutcomesCount: stats.correctOutcomesCount,
