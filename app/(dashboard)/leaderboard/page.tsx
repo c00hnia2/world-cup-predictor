@@ -115,6 +115,7 @@ export default async function LeaderboardPage() {
               key: entry.id,
               position: entry.position,
               displayName: entry.displayName,
+              username: entry.username,
               exactScoresCount: entry.exact_scores_count ?? 0,
               correctOutcomesCount: entry.correct_outcomes_count ?? 0,
               totalPoints: entry.total_points ?? 0,

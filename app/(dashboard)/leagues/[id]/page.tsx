@@ -201,6 +201,7 @@ export default async function LeagueDetailPage({ params }: LeagueDetailPageProps
               key: entry.userId || `${entry.joinedAt}-${entry.position}`,
               position: entry.position,
               displayName: entry.displayName,
+              username: entry.username,
               exactScoresCount: entry.exactScoresCount,
               correctOutcomesCount: entry.correctOutcomesCount,
               totalPoints: entry.totalPoints,
